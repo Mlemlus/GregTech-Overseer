@@ -13,22 +13,26 @@ def actionStatus(response): # Responds based on the recieved HTTP response statu
             updateWorkData(response['data'])
             return "100"
         case '205': # data reset confirmation
-            data = parseIntialData(response['data'])
-            try:
-                app_db = Database(conn_params) # open db connection
-                if insRestart(app_db, data):
-                    return "100", str(uuid.uuid4())  # returns a new session_id with the status
-                else: 
-                    return "205" # resend data
-            except Exception as e:
-                print(f"actionStatus: failed to respond to {response['status']}: {e}", file=sys.stderr)
-                return "500"
-            finally:
-                del app_db # close the connection
+            print(response['data'], file=sys.stderr)
+            return resetUpdate(response['data'])
 
 def updateWorkData(data):
     # parse work data => SQL update
     print("yooo update the work data", file=sys.stderr)
+
+def resetUpdate(raw_data):
+    data = parseIntialData(raw_data)
+    try:
+        db = Database(conn_params) # open db connection
+        if insRestart(db, data):
+            return "100", str(uuid.uuid4())  # returns a new session_id with the status
+        else: 
+            return "205", "CORRUPTED DATA" # resend data
+    except Exception as e:
+        print(f"resetUpdate: failed to respond: {e}", file=sys.stderr)
+        return "500", e
+    finally:
+        del db # close the connection
 
 
 # Route to handle POST requests
