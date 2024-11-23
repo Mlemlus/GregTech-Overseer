@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from database.class_db import db as Database
 import json, uuid, os
 from data_process.data_parse import parseIntialData
-from data_process.data_processes import insRestart
+from data_process.data_processes import insRestart, updWork
 import sys #######################
 
 app = Flask(__name__)
@@ -11,7 +11,7 @@ def actionStatus(response): # Responds based on the recieved HTTP response statu
     match response['status']:
         case '100': # update machines status data
             updateWorkData(response['data'])
-            return "100"
+            return "100", "UPDATE"
         case '205': # data reset confirmation
             data = parseIntialData(response['data'])
             try:
@@ -19,17 +19,25 @@ def actionStatus(response): # Responds based on the recieved HTTP response statu
                 if insRestart(app_db, data):
                     return "100", str(uuid.uuid4())  # returns a new session_id with the status
                 else: 
-                    return "205" # resend data
+                    return "205", "CORRUPTED DATA" # resend data
             except Exception as e:
                 print(f"actionStatus: failed to respond to {response['status']}: {e}", file=sys.stderr)
-                return "500"
+                return "500", str(e)
             finally:
                 del app_db # close the connection
 
 def updateWorkData(data):
-    # parse work data => SQL update
-    print("yooo update the work data", file=sys.stderr)
-
+    try:
+        db = Database(conn_params) # open db connection
+        if updWork(db, data):
+            return "100", "UPDATED"
+        else:
+            return "205", "CORRUPTED DATA"
+    except Exception as e:
+        print(f"updateWorkData: failed to update: {e}", file=sys.stderr)
+        return "500", str(e)
+    finally:
+        del db # close the connection
 
 # Route to handle POST requests
 @app.route('/data', methods=['POST'])

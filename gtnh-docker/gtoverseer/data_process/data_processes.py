@@ -13,18 +13,15 @@ def insRestart(db, data):
 
     # now the machines
 
-    for i in range(2,len(data)):
+    for i in range(2,len(data)+1):
 
         data[i]["tier_ID"] = tiers[data[i]["input_eu"]]["ID"]
         data[i]["oc_computer_ID"] = computer_oc_ID
-        data[i]["work_progress"] = random.randint(1,999) ###########
-        data[i]["work_progress_max"] = random.randint(int(data[i]["work_progress"]/10),1000) ##############
         
         try:
             q.insMachine(db, data[i])
             data[i]["machine_ID"] = q.selMachine(db, data[i]["oc_address"])
             q.insCoord(db, data[i])
-            q.insWork(db, data[i])
         except Exception as e: # we keep this on the hush hush
             print(f"insRestart: Failed to insert machine {data[i]["name"]}: {e}", file=sys.stderr)
             continue
@@ -34,3 +31,11 @@ def insRestart(db, data):
        
     return True
 
+def updWork(db, data):
+    for i in range(1,len(data)+1):
+        try:
+            q.updWork(db, data[str(i)])
+        except Exception as e:
+            print(f"updWork: Failed to update work: {e}", file=sys.stderr)
+            continue
+    return True
