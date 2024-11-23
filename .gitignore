@@ -1,5 +1,5 @@
 # every singe one of them
-#.env
+.env
 
 # not just the vscodes
 .vscode/*
