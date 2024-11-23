@@ -34,6 +34,8 @@ def insRestart(db, data):
 def updWork(db, data):
     for i in range(1,len(data)+1):
         try:
+            if (data[str(i)]["work_progress"] / data[str(i)]["work_progress_max"]) > 0.9:
+                data[str(i)]["work_progress"] = 0
             q.updWork(db, data[str(i)])
         except Exception as e:
             print(f"updWork: Failed to update work: {e}", file=sys.stderr)
