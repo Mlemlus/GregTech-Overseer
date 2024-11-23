@@ -1,0 +1,181 @@
+local component = require("component")
+local serialization = require("serialization") -- JSON
+
+local tiers = {
+    [8] = "ULV", 
+    [32] = "LV", 
+    [128] = "MV", 
+    [512] = "HV", 
+    [2048] = "EV", 
+    [8192] = "IV", 
+    [32768] = "LuV", 
+    [131072] = "ZPM", 
+    [524288] = "UV", 
+    [2097152] = "UHV", 
+    [8388608] = "UEV", 
+    [33554432] = "UIV", 
+    [134217728] = "UMV", 
+    [536870912] = "UXV", 
+    [2147483640] = "MAX"
+}
+
+local function cleanNumber(str)
+    return tonumber((str:gsub(",", "")))
+end
+
+
+-- the bane of my existence, beacuse SOMEBODY DIDNT IMPLEMENT OC FUNCTIONS 
+local function praseSensorString(str)
+    local usage = str:match("Probably uses:???%s*([%d,]+)???EU/t")
+    if usage then
+        return cleanNumber(usage)
+    end
+
+    -- Centrifuge:
+    local machineType = str:match("Machine Type:%s*(.*)")
+    if machineType then
+        return machineType
+    end
+
+    local totalTime = str:match("Total Time in ticks:?%s*([%d,]+)")
+    if totalTime then
+        return cleanNumber(totalTime)
+    end
+
+    local maximumParallel = str:match("Maximum Parallel:?%s*([%d,]+)")
+    if maximumParallel then
+        return cleanNumber(maximumParallel)
+    end
+
+    -- EBF:
+    local heatCapacity = str:match("Heat capacity:?%s*([%d,]+)K")
+    if heatCapacity then
+        return cleanNumber(heatCapacity)
+    end
+
+    local pollutionReduction = str:match("Pollution reduced to:?%s*([%d,]+)%%")
+    if heatCapacity then
+        return cleanNumber(heatCapacity)
+    end
+
+    -- lap cap sensor: --
+    local scientific = str:find('^')
+    if scientific then -- dont care about scientific values
+        return nil
+    end
+
+    local euStored = str:match("EU Stored:?%s*([%d,]+)EU") 
+    if euStored then
+        return cleanNumber(euStored)
+    end
+
+    local usedCapacity = str:match("Used Capacity:%s*([%d%.]+)%%")
+    if usedCapacity then
+        return cleanNumber(usedCapacity)
+    end
+
+    local totalCapacity = str:match("Total Capacity:?%s*([%d,]+)EU")
+    if totalCapacity then
+        return cleanNumber(totalCapacity)
+    end
+
+    local passiveLoss = str:match("Passive Loss:%s*([%d,]+)EU/t")
+    if passiveLoss then
+        return cleanNumber(passiveLoss)
+    end
+
+    local euInOut = str:match("EU [INOUT]+:%s*([%d,]+)EU/t")
+    if euInOut then
+        return cleanNumber(euInOut)
+    end
+
+    local avgEuIn = str:match("Avg EU IN:%s*([%d,]+)")
+    if avgEuIn then
+        return cleanNumber(avgEuIn)
+    end
+
+    local timeToEmpty = str:match("Time to Empty:%s*([%d%.]+)%s*hours")
+    if timeToEmpty then
+        return tonumber(timeToEmpty)
+    end
+
+    local maintenanceStatus = str:match("Maintenance Status:%s*(.*)")
+    if maintenanceStatus then
+        return maintenanceStatus
+    end
+
+    local wirelessMode = str:match("Wireless mode:%s*(.*)")
+    if wirelessMode then
+        return wirelessMode
+    end
+
+    return nil -- womp womp
+end
+
+-- DATA COLLECTION --
+local data = {}
+
+-- OC controller machine
+for address in component.list("computer") do
+    table.insert(data, {
+        name = "computer",
+        oc_address = address
+    })
+end
+
+-- Iteration over GT machines
+for address in component.list("gt_machine") do
+    local adapter = component.proxy(address) -- proxy address for interaction
+    local sensorStringTable = adapter.getSensorInformation()
+    local sensorValuesTable
+    for key, value in pairs(sensorStringTable) do
+        print(value) --DEBUG
+        local varName = value:match("^(.-):") -- matches chars before :
+        print(varName) --DEBUG
+        -- oddball strings
+        if varName == "Max Energy Income" then
+            local energyIncome, amperage, tier = value:match("Max Energy Income: §e([%d,]+)§r EU/t%(%*(%d+)A%) Tier: §e(%a+)§r")
+            print(energyIncome, amperage, tier) --DEBUG
+            sensorValuesTable["energy_income"] = cleanNumber(energyIncome)
+            sensorValuesTable["amperage"] = cleanNumber(amperage)
+            sensorValuesTable["tier"] = tier
+        elseif value:find("Tier") then -- sometimes this string is different
+            local energyIncome, amperage, tier = value:match("§e([%d,]+)§r EU/t%(%*(%d+)A%) Tier: §e(%a+)§r")
+            print(energyIncome, amperage, tier) --DEBUG
+            sensorValuesTable["energy_income"] = cleanNumber(energyIncome)
+            sensorValuesTable["amperage"] = cleanNumber(amperage)
+            sensorValuesTable["tier"] = tier
+        elseif varName == "Problems" then
+            local problems, efficiency = value:match("Problems:%s*(%d+)%s*Efficiency:%s*([%d%.]+)")
+            print(problems, efficiency) --DEBUG
+            sensorValuesTable["problems"] = problems
+            sensorValuesTable["efficiency"] = efficiency
+        else
+        -- main parser
+            local parsedValue = praseSensorString(value)
+            if parsedValue then -- has to get parsed
+                print(parsedValue) --DEBUG
+                sensorValuesTable[varName] = parsedValue
+            end
+        end
+    end
+
+    local inputVoltage = adapter.getInputVoltage -- can check tier on singleblock machines
+    if inputVoltage ~= 0 then
+        sensorValuesTable["tier"] = tiers[inputVoltage]
+    end
+
+    table.insert(data, {
+        name = adapter.getName(),
+        oc_address = address,
+        is_work_allowed = adapter.isWorkAllowed(),
+        coords = adapter.getCoordinates(),
+        work_progress = adapter.getWorkProgress(),
+        work_progress_max = adapter.getWorkMaxProgress(),
+        sensorValuesTable
+    })
+end
+
+local jsonData = serialization.serialize(data)
+
+print(jsonData)

@@ -1,0 +1,176 @@
+name: gtnh
+services:
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale_gtnh
+    # Hostname for the "machine" which is the container running. appears as the name of the machine in Tailscale
+    hostname: gtnh
+    environment:
+      # Tailscale auth key from their script
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_ROUTES=${TS_ROUTE}
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      # Required by Tailscale
+      - ./tailscale/state:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun # for VPN tunnel without userspace
+    cap_add:
+      # Also required by Tailscale (permissions)
+      - net_admin
+      - sys_module
+    restart: ${RESTART_POLICY}
+    networks:
+      frontend:
+        ipv4_address: ${TS_IP}
+
+  gtnh-server:
+    # docker build from the dockerfile in gtnh-server
+    build:
+      context: ./gtnh-server
+      dockerfile: Dockerfile
+    container_name: gtnh_server
+    # Tailscale needs to be running so the server starts (it's not accesible otherwise)
+    depends_on:
+      tailscale:
+        condition: service_started
+    volumes:
+      - ${GTNHS_BACKUPS_DIR}:/minecraft/backups
+    restart: ${RESTART_POLICY}
+    networks:
+      frontend:
+          ipv4_address: ${GTNHS_IP}
+      backend:
+          ipv4_address: 10.21.31.3
+
+  gtoverseer-server:
+    build:
+      context: ./gtoverseer
+      dockerfile: Dockerfile
+    container_name: GTOverseer_server
+    depends_on:
+      gtoverseer-db:
+        condition: service_started
+    restart: ${RESTART_POLICY}
+    environment:
+      DBNAME: "postgres"
+      USER: "gtoverseer_app"
+      PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
+      HOST: "10.22.32.4"
+      PORT: "${POSTGRES_PORT}"
+    networks:
+      frontend: ##############################
+        ipv4_address: 10.20.30.5 ################
+      backend:
+        ipv4_address: 10.21.31.5
+      services:
+        ipv4_address: 10.22.32.5
+
+  gtoverseer-db:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+      args:
+        GTOVERSEER_POSTGRES_PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
+    container_name: GTOverseer_postgre
+    restart: ${RESTART_POLICY}
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      PGDATA: "${POSTGRES_DATA_DIRECTORY}"
+    mem_limit: ${POSTGRES_MEM_LIMIT}
+    mem_reservation: ${POSTGRES_MEM_RESERVATION}
+    command: >-
+      postgres
+      -c hba_file='/etc/postgresql/pg_hba.conf'
+      -c max_connections=${max_connections}
+      -c shared_buffers=${shared_buffers}
+      -c effective_cache_size=${effective_cache_size}
+      -c maintenance_work_mem=${maintenance_work_mem}
+      -c checkpoint_completion_target=${checkpoint_completion_target}
+      -c wal_buffers=${wal_buffers}
+      -c default_statistics_target=${default_statistics_target}
+      -c random_page_cost=${random_page_cost}
+      -c effective_io_concurrency=${effective_io_concurrency}
+      -c work_mem=${work_mem}
+      -c huge_pages=${huge_pages}
+      -c min_wal_size=${min_wal_size}
+      -c max_wal_size=${max_wal_size}
+      -c wal_level=${wal_level}
+      -c max_wal_senders=${max_wal_senders}
+      -c logging_collector='off'
+      -c log_directory='/db-logs/postgresql'
+      -c log_destination='stderr'
+      -c log_filename='postgresql-%Y-%m-%d_%H%M%S.log'
+      -c log_truncate_on_rotation='off'
+      -c log_min_messages='warning'
+      -c log_min_error_statement='error'
+      -c log_connections='on'
+      -c log_disconnections='on'
+      -c log_line_prefix='%m [%p]'
+      -c log_statement='ddl'
+      -c log_line_prefix='%m [%p]'
+      -c unix_socket_permissions='0770'
+    volumes:
+      - db_gtoverseer:${POSTGRES_DATA_DIRECTORY}
+      - ./postgres/db-logs:/db-logs:rw
+      - ./postgres/db-backups:/db-backups:rw
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT}:5432"
+    networks:
+      services:
+        ipv4_address: 10.22.32.4
+
+  tmp-pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: GTOverseer_pgadmin4
+    restart: ${RESTART_POLICY}
+    environment:
+      PGADMIN_DEFAULT_EMAIL: babicovydobroty@brambory.cz
+      PGADMIN_DEFAULT_PASSWORD: 1kilosoli
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - tmp_pgadmin:/var/lib/pgadmin
+    ports:
+      - "127.0.0.1:5050:80"
+    networks:
+      frontend:
+        ipv4_address: 10.20.30.10
+      services:
+        ipv4_address: 10.22.32.10
+
+
+volumes:
+  db_gtoverseer:
+    name: postgres-db-gtoverseer
+  tmp_pgadmin:
+
+networks:
+  # For external communication (through tailscale)
+  frontend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${TS_ROUTE}
+
+  # For communication between the server and GTOverseer
+  backend:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.21.31.0/24
+    internal: true
+
+  # Internal communication between the database and GTOverseer
+  services:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.22.32.0/24
+    internal: true
+
+
+
+# Q: Why isn't services same as the backend network?
+  # A: FALSE SENSE OF SECURITY GODDAMIT!
+  # Also you could probably get into the databse through the OC stations in gtnh-server

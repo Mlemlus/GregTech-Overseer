@@ -1,0 +1,155 @@
+// Just a reference file
+// the actuall lua script is in https://github.com/Mlemlus/mlemlus-openprograms/tree/master/gtoverseer
+OC Functions for a basic GT machine
+    getName
+    getOwnerName
+    getCoordinates
+    getSensorInformation
+    getWorkProgress
+    getWorkMaxProgress
+    getInputVoltage -- returns EU input for singleblock machines (multiblock is 0)
+    isMachineActive -- boolean of processing state
+        hasWork
+    isWorkAllowed -- returns if this block is currently allowed to work
+    setWorkAllowed -- sets if this block is allowed to work
+    getAverageElectricInput -- returns input energy when working
+        getEUInputAverage -- for EU 
+    getOutputVoltage
+    getAverageElectricOutput
+        getEUOutputAverage 
+    getOutputAmperage
+    getEUCapacity -- eu capacity of the block
+        getEUMaxStored
+    getEUCapacity*STRING*
+    getEUStored
+        getStoredEU
+    getEUStored*STRING*
+    getSteamCapacity
+        getSteamMaxStored
+    getSteamStored
+
+OC Functions for power_source
+    Battery buffer (gt_batterybuffer) => totals have to be extracted from sensor_info
+        getBatteryCharge(slot) -- returns EU currently stored in a battery in the specified slot
+        getMaxBatteryCharge(slot) -- getBatteryCharge but max EU value
+
+    Lapotronic Supercapacitor (gt_machine)
+        getStoredEU*STRING* -- actually returns stored EU (I cannot believe it)
+        getEUCapacity*STRING* -- returns max eu capacity
+
+Sensor Info Structures
+it's always a table and the order, number of values in one line and formatting is almost always fucking random
+note that variables are noted with *TYPE_OF_VARIABLE*
+    Singleblock machines: 
+    [   
+        "Progress:",
+        "§a*INTEGER*§r s / §e*INTEGER*§r s",
+        "Stored energy:",
+        "§a*INTEGER*§r EU / §e*INTEGER*§r EU",
+        "Porbably uses: §c0§r EU/t at §c0§r A"
+    ]
+Singleblocks have the function getInputVoltage so these values are useless
+
+    Lapotronic Supercapacitor:
+    [
+        "§eOperational Data:§r",
+        "EU Stored: *INTEGER*EU",
+        "EU Stored: *INTEGER*EU", // sci value
+        "Used Capacity: *FLOAT*%",
+        "Total Capacity: *INTEGER*EU",
+        "Total Capacity: *INTEGER*EU",
+        "Passive Loss: *INTEGER*EU/t",
+        "EU IN: *INTEGER*EU/t",
+        "EU OUT: *INTEGER*EU/t",
+        "Avg EU IN: *INTEGER* (last 5 seconds)",
+        "Avg EU OUT: *INTEGER* (last 5 seconds)",
+        "Maintenance Status: §a*STRING*§r",     // when string different - set to 1 (or smthin)
+        "Wireless mode: §c*STRING*§r",
+        "§4UHV§r Capacitors detected: *INTEGER*",
+        "§5UEV§r Capacitors detected: *INTEGER*",
+        "§1§lUIV§r Capactiors detected: *INTEGER*",
+        "§c§l§nUMV§r Capacitors detected: *INTEGER*",
+        "Total wireless EU: §c*INTEGER*",
+        "Total wireless EU: §c*INTEGER*"    
+    ]
+
+Some multiblock machines:
+    LCR,distillation tower, vacuum freezer, Implossion Compressor, cleanroom controller, Oil cracking unit, pyrolyse oven, Assembling Line
+    [
+        "Progress: §a*INTEGER*§r s / §e*INTEGER*§r s",
+        "Stored Energy: §a*INTEGER*§r EU / §e*INTEGER*§r EU",
+        "Probably uses: §c*INTEGER*§r EU/t",
+        "Max Energy Income: §e*INTEGER*§r EU/t(*2A) Tier: §e*STRING*§r",
+        "Problems: §c*INTEGER*§r Efficiency: §e*FLOAT*§r %",
+        "Pollution reduced to: §a*INTEGER*§r %"
+    ]
+    
+    Electric Blast Furnace:
+    [
+        "Progress: §a*INTEGER*§r s / §e*INTEGER*§r s",
+        "Stored Energy: §a*INTEGER*§r EU / §e*INTEGER*§r EU",
+        "Probably uses: §c*INTEGER*§r EU/t",
+        "Max Energy Income: §e*INTEGER*§r EU/t(*2A) Tier: §e*STRING*§r",
+        "Problems: §c*INTEGER*§r Efficiency: §e*FLOAT*§r %",
+        "Heat capacity: §a*INTEGER*§r K",
+        "Pollution reduced to: §a*INTEGER*§r %"
+    ]
+    Max energy income int scales with the number of energy hatches, so 2xMV = 2x128 EU => 256
+    Tier also scales correctly
+
+    Combustion Engine:
+    [
+        "§9Diesel Engine§r",
+        "Stored Energy: §a*INTEGER*§r EU / §e*INTEGER*§r EU",
+        "§a*STRING*§r",           // FOR MAINTENANCE ISSUES, normally "No Maintenance issues"
+        "Current Output: §c*INTEGER*§r EU/t",
+        "Fuel Consumption: §e*INTEGER*§r L/t",
+        "Fuel Value: §e*INTEGER*§r EU/L",
+        "Fuel Remaining: §*INTEGER*§r L",
+        "Current Efficiency: §e*FLOAT*§e %",
+        "Pollution reduced to: §a*INTEGER*§r %"
+    ]
+
+The "first value is getName()" multiblocks
+    ExxonMobil Chemical Plant:
+    [
+        "chemicalplant.controller.tier.single",
+        "Machine Type: §eChemical Plant§r",
+        "Progress: §a*INTEGER*§r s / §e*INTEGER*§r s",
+        "Stored Energy:",           // WHYYYYYYYYY IS THE VALUE ON NEXT LINEEEEEEEEEE
+        "§a*INTEGER*§r EU / §e*INTEGER*§r EU",
+        "Max Energy Income:",
+        "§e*INTEGER*§r EU/t(*2A) Tier: §e*STRING*§r",
+        "Probably uses:",
+        "§c*INTEGER*§r EU/t",
+        "Problems: §c*INTEGER*§r Efficiency: §e*FLOAT*§r %",
+        "Maximum Parallel: §a*INTEGER*§r",
+        "Total Time Since Built: §*INTEGER*§r Weeks, §*INTEGER*§r Days",
+        "§*INTEGER*§r Hours, §*INTEGER*§r Minutes, §*INTEGER*§r Seconds.",
+        "Total Time in ticks: §*INTEGER*"
+    ]
+    GT++ machines (hopefully):
+    Large Thermal Refinery, Ore Washing Plant, Industrial Material Press, Maceration Stack, 
+    Industrial Centrifuge, Industrial Mixing machine, Industrial Extrusion Machine, Large sifter, Wire factory, Industrial Coke Oven
+    [
+        "industrialsalloyamelter.controller.tier.single",   // lmao they got a typo in the name, even in the function
+        "Machine Type: §eCFluid Alloy Cooker§r",
+        "Progress: §a*INTEGER*§r s / §e*INTEGER*§r s",
+        "Stored Energy:",
+        "§a*INTEGER*§r EU / §e*INTEGER*§r EU",
+        "Max Energy Income:",
+        "§e*INTEGER*§r EU/t(*2A) Tier: §e*STRING*§r",
+        "Probably uses:",
+        "§c*INTEGER*§r EU/t",
+        "Problems: §c*INTEGER*§r Efficiency: §e*FLOAT*§r %",
+        "Pollution: §c*INTEGER*§r/sec",
+        "Pollution reduced to: §a*INTEGER*§r %",
+        "Maximum Parallel: §a*INTEGER*§r",
+        "Total Time Since Built: §*INTEGER*§r Weeks, §*INTEGER*§r Days",
+        "§*INTEGER*§r Hours, §*INTEGER*§r Minutes, §*INTEGER*§r Seconds.",
+        "Total Time in ticks: §*INTEGER*"
+    ]
+
+
+
+

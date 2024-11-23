@@ -1,0 +1,14 @@
+# every singe one of them
+#.env
+
+# not just the vscodes
+.vscode/*
+
+# but the minecraft,
+gtnh-docker/gtnh-server/minecraft/*
+!gtnh-docker/gtnh-server/minecraft/config*
+!gtnh-docker/gtnh-server/minecraft/start.sh
+
+# and the zips too
+*.zip
+
