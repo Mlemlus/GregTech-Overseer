@@ -1,5 +1,5 @@
 # every singe one of them
-.env
+gtnh-docker/.env
 
 # not just the vscodes
 .vscode/*
