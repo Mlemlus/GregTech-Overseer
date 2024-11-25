@@ -63,6 +63,22 @@ def insWork(db, kwargs):
             "work_progress_max" = EXCLUDED."work_progress_max"
     """, kwargs)
 
+def updWork(db, kwargs):
+    db.insert("""
+        INSERT INTO gtoverseer.work ("machine_ID", work_progress, work_progress_max)
+        SELECT
+            m."ID" AS "machine_ID",
+            %(work_progress)s AS work_progress,
+            %(work_progress_max)s AS work_progress_max
+        FROM gtoverseer.machine m
+        WHERE m.oc_address = %(oc_address)s
+        ON CONFLICT ("machine_ID") DO UPDATE
+        SET
+            "work_progress" = EXCLUDED."work_progress", 
+            "work_progress_max" = EXCLUDED."work_progress_max",
+            "last_worked_at" = CURRENT_TIMESTAMP
+    """, kwargs)
+
 def insPowerSource(db, kwargs):
     db.insert("""
         INSERT INTO gtoverseer.power_source ("machine_ID", "output_amp", "current_capacity", "max_capacity")

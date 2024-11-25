@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from database.class_db import db as Database
 import json, uuid, os
 from data_process.data_parse import parseIntialData
-from data_process.data_processes import insRestart
+from data_process.data_processes import insRestart, updWork
 import sys #######################
 
 app = Flask(__name__)
@@ -11,14 +11,22 @@ def actionStatus(response): # Responds based on the recieved HTTP response statu
     match response['status']:
         case '100': # update machines status data
             updateWorkData(response['data'])
-            return "100"
+            return "100", "UPDATE"
         case '205': # data reset confirmation
-            print(response['data'], file=sys.stderr)
             return resetUpdate(response['data'])
 
 def updateWorkData(data):
-    # parse work data => SQL update
-    print("yooo update the work data", file=sys.stderr)
+    try:
+        db = Database(conn_params) # open db connection
+        if updWork(db, data):
+            return "100", "UPDATED"
+        else:
+            return "205", "CORRUPTED DATA"
+    except Exception as e:
+        print(f"updateWorkData: failed to update: {e}", file=sys.stderr)
+        return "500", str(e)
+    finally:
+        del db # close the connection
 
 def resetUpdate(raw_data):
     data = parseIntialData(raw_data)
