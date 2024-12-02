@@ -2,7 +2,7 @@ name: gtnh
 services:
   tailscale:
     image: tailscale/tailscale:latest
-    container_name: tailscale_gtnh
+    container_name: gtnh_tailscale
     # Hostname for the "machine" which is the container running. appears as the name of the machine in Tailscale
     hostname: gtnh
     environment:
@@ -43,11 +43,11 @@ services:
       backend:
           ipv4_address: 10.21.31.3
 
-  gtoverseer-server:
+  gtoverseer-backend:
     build:
-      context: ./gtoverseer
+      context: ./gtoverseer-backend
       dockerfile: Dockerfile
-    container_name: GTOverseer_server
+    container_name: GTOverseer_backend
     depends_on:
       gtoverseer-db:
         condition: service_started
@@ -59,8 +59,6 @@ services:
       HOST: "10.22.32.4"
       PORT: "${POSTGRES_PORT}"
     networks:
-      frontend: ##############################
-        ipv4_address: 10.20.30.5 ################
       backend:
         ipv4_address: 10.21.31.5
       services:
