@@ -99,3 +99,6 @@ def selUserNickname(db, nickname):
 
 def selTier(db, voltage):
     return db.selectSingle('SELECT ("ID") FROM gtoverseer.tier WHERE eu = %s', voltage)
+
+def machineReport(db):
+    return db.select("SELECT * FROM gtoverseer.machine_report")

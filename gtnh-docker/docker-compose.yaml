@@ -43,6 +43,21 @@ services:
       backend:
           ipv4_address: 10.21.31.3
 
+  gtoverseer-frontend:
+    build:
+      context: ./gtoverseer-frontend
+      dockerfile: Dockerfile
+    container_name: GTOverseer_frontend
+    depends_on:
+      gtoverseer-backend:
+        condition: service_started
+    restart: ${RESTART_POLICY}
+    networks:
+      backend:
+        ipv4_address: 10.21.31.9
+      frontend:
+        ipv4_address: ${GTO_FRONTEND_IP}
+
   gtoverseer-backend:
     build:
       context: ./gtoverseer-backend

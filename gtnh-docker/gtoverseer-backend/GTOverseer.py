@@ -4,6 +4,7 @@ import json, uuid, os
 from data_process.data_parse import parseIntialData
 from data_process.data_processes import insRestart, updWork
 import sys #######################
+import database.query as q ############
 
 app = Flask(__name__)
 
@@ -61,10 +62,19 @@ def handlePostRequest():
     # Send back a response
     return status + response
 
-# @app.route('/data', methods=['GET'])
-# def handleGetRequest():
-#     # Who are you?
-#     return jsonify(data_pysk)
+@app.route('/data', methods=['GET'])
+def handleGetRequest():
+    data = {}
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(q.machineReport(db))
+    except Exception as e:
+        print(f"GET /data: no database connection: {e}", file=sys.stderr)
+        data = {'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+    
 
 
 
