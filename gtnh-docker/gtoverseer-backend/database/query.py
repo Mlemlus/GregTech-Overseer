@@ -102,3 +102,27 @@ def selTier(db, voltage):
 
 def machineReport(db):
     return db.select("SELECT * FROM gtoverseer.machine_report")
+
+def insUser(db, kwargs):
+    return db.insert("""
+        INSERT INTO gtoverseer.user ("nickname", "email", "password_hash")
+        VALUES (
+            %(nickname)s,
+            %(email)s, 
+            gtoverseer.crypt(%(password)s, gtoverseer.gen_salt('bf'))
+        )
+        ON CONFLICT ("nickname") DO UPDATE
+        SET
+            "nickname" = EXCLUDED."nickname",
+            "email" = EXCLUDED."email",
+            "password_hash" = EXCLUDED."password_hash"
+        """, kwargs)
+
+def selUserEmailPassword(db, kwargs):
+    return db.selectSingle("""
+        SELECT "nickname" FROM gtoverseer.user 
+        WHERE 
+            email = %(email)s
+            AND
+            password_hash = gtoverseer.crypt(%(password)s, password_hash)
+        """, kwargs)

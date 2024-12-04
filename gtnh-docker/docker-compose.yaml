@@ -52,6 +52,8 @@ services:
       gtoverseer-backend:
         condition: service_started
     restart: ${RESTART_POLICY}
+    environment:
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
     networks:
       backend:
         ipv4_address: 10.21.31.9
@@ -73,6 +75,9 @@ services:
       PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
       HOST: "10.22.32.4"
       PORT: "${POSTGRES_PORT}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
     networks:
       backend:
         ipv4_address: 10.21.31.5
@@ -121,7 +126,7 @@ services:
       -c log_connections='on'
       -c log_disconnections='on'
       -c log_line_prefix='%m [%p]'
-      -c log_statement='ddl'
+      -c log_statement='all'
       -c log_line_prefix='%m [%p]'
       -c unix_socket_permissions='0770'
     volumes:

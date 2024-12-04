@@ -31,8 +31,8 @@ CREATE TABLE "gtoverseer"."privilege" (
 
 CREATE TABLE "gtoverseer"."user" (
 	"ID"				SERIAL PRIMARY KEY,
-	"nickname"			VARCHAR(50) NOT NULL UNIQUE,
-	"email"				BYTEA UNIQUE,
+	"nickname"			VARCHAR(16) NOT NULL UNIQUE,
+	"email"				VARCHAR UNIQUE,
 	"password_hash"		CHAR(60)
 );
 
@@ -191,14 +191,14 @@ INSERT INTO "gtoverseer"."privilege" ("name") VALUES
 	('Manage Logs');
 
 -- example users
-INSERT INTO "gtoverseer"."user" ("nickname", "email", "password_hash") VALUES
-	('Meemlus', 'meemlus@email.cz', 'heslicko'),
-	('_Zyosh_', 'zyosh@email.cz', 'maslicko'),
-	('bobik', 'bobik@email.cz', 'jahoda'),
-	('pepik', 'jahodak@email.cz', 'svickova'),
-	('rostik', 'rostik@email.cz', 'smazak'),
-	('kolik', 'maverick@email.cz', 'spaneslky ptacek'),
-	('igor', 'igor@email.cz', 'spagety');
+-- INSERT INTO "gtoverseer"."user" ("nickname", "email", "password_hash") VALUES
+-- 	('Meemlus', 'meemlus@email.cz', 'heslicko'),
+-- 	('_Zyosh_', 'zyosh@email.cz', 'maslicko'),
+-- 	('bobik', 'bobik@email.cz', 'jahoda'),
+-- 	('pepik', 'jahodak@email.cz', 'svickova'),
+-- 	('rostik', 'rostik@email.cz', 'smazak'),
+-- 	('kolik', 'maverick@email.cz', 'spaneslky ptacek'),
+-- 	('igor', 'igor@email.cz', 'spagety');
 
 -- some example cables
 INSERT INTO "gtoverseer"."cable" ("name", "density", "tier_ID", "max_amp", "loss") VALUES

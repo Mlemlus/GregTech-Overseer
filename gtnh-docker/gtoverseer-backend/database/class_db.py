@@ -19,7 +19,7 @@ class db:
         try:
             cur.execute(query, values) # Executes the query with the values
             self.conn.commit()
-            cur.close()
+            return True, None
         except Exception as e:
             self.conn.rollback() # rollback when error
             return False, e

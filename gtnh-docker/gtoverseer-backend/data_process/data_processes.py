@@ -1,5 +1,5 @@
 import database.query as q
-import sys, random ##########
+import sys ##########
 
 def insRestart(db, data):
     # convert table tier to dictionary

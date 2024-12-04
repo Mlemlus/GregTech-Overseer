@@ -1,17 +1,19 @@
 import streamlit as st
-import requests, time
+import requests, os
 from PIL import Image
 from io import BytesIO
 
-if "logged_in" not in st.session_state: # init login status tracking
-    st.session_state.logged_in = False
-
+#### Session state inicializations ####
 if "show_logout_confirm" not in st.session_state: # init logout process tracking
     st.session_state.show_logout_confirm = False
 
+if "backlog_message" not in st.session_state: # init message that passes through page reload
+    st.session_state.backlog_message = ""
 
-username = "meemlus" ###################
+if "username" not in st.session_state: # init login status tracking
+    st.session_state.username = ""
 
+#### Functions ####
 @st.cache_data
 def fetch_image(username): # get profile picture, uses mineatar.io and mojang public API
     try:
@@ -25,8 +27,8 @@ def fetch_image(username): # get profile picture, uses mineatar.io and mojang pu
         return False # probably should implement troll face instead
 
 
+#### Pages ####
 login_page = st.Page("pages/login.py", title="Log in", icon=":material/login:")
-#logout_page = st.Page(logout, title="Log out", icon=":material/logout:")
 
 
 dashboard = st.Page("pages/dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True)
@@ -38,22 +40,23 @@ cable_page = st.Page("pages/cable.py", title="Cables", icon=":material/cable:")
 
 user_config = st.Page("pages/user_config.py", title="Profile settings", icon=":material/settings:")
 
-# bugs = st.Page("reports/bugs.py", title="Bug reports", icon=":material/bug_report:")
-# alerts = st.Page(
-#    "reports/alerts.py", title="System alerts", icon=":material/notification_important:"
-# )
+admin_manage_user = st.Page("pages/admin_user.py", title="Users managment", icon=":material/group:")
 
-# search = st.Page("tools/search.py", title="Search", icon=":material/search:")
-# history = st.Page("tools/history.py", title="History", icon=":material/history:")
+######## Body ########
 
-##### Sidebar logged in stuff
-if st.session_state.logged_in and st.session_state.show_logout_confirm == False:
+#### Backlog info message print #####
+if st.session_state.backlog_message != "":
+    st.info(st.session_state.backlog_message)
+    st.session_state.backlog_message = ""
+
+#### Sidebar logged in stuff ####
+if st.session_state.username != "" and st.session_state.show_logout_confirm == False:
     col1, col2 = st.sidebar.columns([1,2])
     col1.write("Logged in as:")
-    if fetch_image(username):
-        col2.image(fetch_image(username), caption="meemlus")
+    if fetch_image(st.session_state.username):
+        col2.image(fetch_image(st.session_state.username), caption=st.session_state.username)
     else:
-        col2.text(username)
+        col2.text(st.session_state.username)
     if col1.button("Logout"):
         st.session_state.show_logout_confirm = True
         st.rerun()
@@ -62,23 +65,25 @@ if st.session_state.show_logout_confirm:
     st.sidebar.warning("Are you sure you want to logout?")
     col1, col2 = st.sidebar.columns(2)
     if col1.button("Yes"):
-        st.session_state.logged_in = False
         st.session_state.show_logout_confirm = False
+        st.session_state.username = ""
+        st.session_state.backlog_message = "Successfully logged out"
         st.rerun()
     if col2.button("Cancel"):
         st.session_state.show_logout_confirm = False
         st.rerun()
 
 
-
-if st.session_state.logged_in:
-    pg = st.navigation(
-        {
-            "Reports": [dashboard,],
+#### Sidebar navigation ####
+if st.session_state.username != "":
+    navigation = {
+            "Reports": [dashboard],
             "Utils": [machine_page, pw_network_page, cable_page, server_config],
-            "Account": [user_config],
-        }
-    )
+            "Account": [user_config]
+            }
+    if st.session_state.username == os.getenv("ADMIN_USERNAME"):
+        navigation["Administration"] = [admin_manage_user]
+    pg = st.navigation(navigation)
 else:
     pg = st.navigation([login_page])
 
