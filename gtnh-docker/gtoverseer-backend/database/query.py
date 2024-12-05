@@ -119,7 +119,7 @@ def insUser(db, kwargs):
         """, kwargs)
 
 def selUserEmailPassword(db, kwargs):
-    return db.selectSingle("""
+    return db.selectMultiple("""
         SELECT "nickname" FROM gtoverseer.user 
         WHERE 
             email = %(email)s

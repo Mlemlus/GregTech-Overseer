@@ -69,9 +69,9 @@ def handlePostRequest():
 @app.route('/api/authenticate', methods=['POST'])
 def handleApiAuthRequest():
     data = request.json
-
     db = Database(conn_params) # open db connection
-    return jsonify(loginProcess(db, data['email'], data['password'])) # returns dict with login info
+    response = loginProcess(db, data['email'], data['password'])
+    return jsonify(response) # returns dict with login info
 
     # try:
     #     db = Database(conn_params) # open db connection
@@ -95,7 +95,7 @@ def handleApiAddUserRequest():
         addUser(data['username'], data['email'], data['password'])
         return jsonify({'status':True}) # returns dict with login info
     except Exception as e:
-        print(f"POST /api/add/user: no database connection: {e}", file=sys.stderr)
+        print(f"POST /api/add/user: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
         return jsonify(data)
     finally:

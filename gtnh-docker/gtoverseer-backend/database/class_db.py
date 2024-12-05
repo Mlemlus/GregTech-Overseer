@@ -50,6 +50,18 @@ class db:
         finally:
             cur.close()
     
+    def selectMultiple(self, query, value):
+        cur = self.conn.cursor()
+        try:
+            cur.execute(query, value)
+            val = cur.fetchone()
+            return val
+        except Exception as e:
+            self.conn.rollback()
+            return False, e
+        finally:
+            cur.close()
+
     def update(self, query, values):
         cur = self.conn.cursor()
         try:
