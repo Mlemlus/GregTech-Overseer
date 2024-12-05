@@ -92,7 +92,7 @@ def handleApiAddUserRequest():
 
     try:
         db = Database(conn_params) # open db connection
-        addUser(data['username'], data['email'], data['password'])
+        addUser(db, data['username'], data['email'], data['password'])
         return jsonify({'status':True}) # returns dict with login info
     except Exception as e:
         print(f"POST /api/add/user: {e}", file=sys.stderr)

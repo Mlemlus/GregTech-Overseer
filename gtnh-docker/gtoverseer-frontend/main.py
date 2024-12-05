@@ -1,17 +1,18 @@
 import streamlit as st
+from streamlit import session_state as ss
 import requests, os
 from PIL import Image
 from io import BytesIO
 
 #### Session state inicializations ####
-if "show_logout_confirm" not in st.session_state: # init logout process tracking
-    st.session_state.show_logout_confirm = False
+if "show_logout_confirm" not in ss: # init logout process tracking
+    ss.show_logout_confirm = False
 
-if "backlog_message" not in st.session_state: # init message that passes through page reload
-    st.session_state.backlog_message = ""
+if "backlog_message" not in ss: # init message that passes through page reload
+    ss.backlog_message = ""
 
-if "username" not in st.session_state: # init login status tracking
-    st.session_state.username = ""
+if "username" not in ss: # init login status tracking
+    ss.username = ""
 
 #### Functions ####
 @st.cache_data
@@ -28,63 +29,64 @@ def fetch_image(username): # get profile picture, uses mineatar.io and mojang pu
 
 
 #### Pages ####
+## Login/Authentication ##
 login_page = st.Page("pages/login.py", title="Log in", icon=":material/login:")
 
-
+## Reports ##
 dashboard = st.Page("pages/dashboard.py", title="Dashboard", icon=":material/dashboard:", default=True)
 
+## Utils ##
 pw_network_page = st.Page("pages/power_network.py", title="Power Networks", icon=":material/bolt:")
 machine_page = st.Page("pages/machine.py", title="Machines", icon=":material/factory:")
 server_config = st.Page("pages/server_config.py", title="Server configuration", icon=":material/settings:")
 cable_page = st.Page("pages/cable.py", title="Cables", icon=":material/cable:")
 
+## Account ##
 user_config = st.Page("pages/user_config.py", title="Profile settings", icon=":material/settings:")
 
+## Admin only pages ##
 admin_manage_user = st.Page("pages/admin_user.py", title="Users managment", icon=":material/group:")
 
-######## Body ########
-
-#### Backlog info message print #####
-if st.session_state.backlog_message != "":
-    st.info(st.session_state.backlog_message)
-    st.session_state.backlog_message = ""
-
-#### Sidebar logged in stuff ####
-if st.session_state.username != "" and st.session_state.show_logout_confirm == False:
-    col1, col2 = st.sidebar.columns([1,2])
-    col1.write("Logged in as:")
-    if fetch_image(st.session_state.username):
-        col2.image(fetch_image(st.session_state.username), caption=st.session_state.username)
-    else:
-        col2.text(st.session_state.username)
-    if col1.button("Logout"):
-        st.session_state.show_logout_confirm = True
-        st.rerun()
-
-if st.session_state.show_logout_confirm:
-    st.sidebar.warning("Are you sure you want to logout?")
-    col1, col2 = st.sidebar.columns(2)
-    if col1.button("Yes"):
-        st.session_state.show_logout_confirm = False
-        st.session_state.username = ""
-        st.session_state.backlog_message = "Successfully logged out"
-        st.rerun()
-    if col2.button("Cancel"):
-        st.session_state.show_logout_confirm = False
-        st.rerun()
-
-
-#### Sidebar navigation ####
-if st.session_state.username != "":
+#### Body ####
+## Sidebar navigation ##
+if ss.username != "":
     navigation = {
             "Reports": [dashboard],
             "Utils": [machine_page, pw_network_page, cable_page, server_config],
             "Account": [user_config]
             }
-    if st.session_state.username == os.getenv("ADMIN_USERNAME"):
+    if ss.username == os.getenv("ADMIN_USERNAME"):
         navigation["Administration"] = [admin_manage_user]
     pg = st.navigation(navigation)
 else:
     pg = st.navigation([login_page])
 
+## Sidebar logged in stuff ##
+# Default logged in state
+if ss.username != "" and ss.show_logout_confirm == False:
+    col1, col2 = st.sidebar.columns([1,2])
+    col1.write("Logged in as:")
+    if fetch_image(ss.username):
+        col2.image(fetch_image(ss.username), caption=ss.username)
+    else:
+        col2.text(ss.username)
+    if col1.button("Logout"):
+        ss.show_logout_confirm = True
+        st.rerun()
+
+# Logging out state
+if ss.show_logout_confirm:
+    st.sidebar.warning("Are you sure you want to logout?")
+    col1, col2 = st.sidebar.columns(2)
+    if col1.button("Yes"):
+        ss.show_logout_confirm = False
+        ss.username = ""
+        ss.backlog_message = "Successfully logged out"
+        st.rerun()
+    if col2.button("Cancel"):
+        ss.show_logout_confirm = False
+        st.rerun()
+
+
+#### "Main" ####
 pg.run()

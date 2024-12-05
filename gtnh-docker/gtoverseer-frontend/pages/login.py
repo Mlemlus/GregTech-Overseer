@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit import session_state as ss
 import requests
 
 #### Functions ####
@@ -8,19 +9,25 @@ def login(email, password):
         response = requests.post("http://10.21.31.5:40649/api/authenticate", json={"email": str(email), "password": str(password)})
         data = response.json()
         if data["status"]: # status is a boolean
-            st.session_state.username = data["username"] # set session username
-            st.session_state.logged_in = True
-            st.session_state.backlog_message = "Login successful"
+            ss.username = data["username"] # set session username
+            ss.logged_in = True
+            ss.backlog_message = "Login successful"
         else:
-            st.session_state.backlog_message ="Authentication failed"
+            ss.backlog_message ="Authentication failed"
     except Exception as e:
-        st.error(f"Error connecting to authentication server: {e}")
+        ss.backlog_message = f"Login error: {e}"
 
 #### Body ####
+## Backlog info message print ###
+if ss.backlog_message != "":
+    st.info(ss.backlog_message)
+    ss.backlog_message = ""
+
+## Header ##
 st.write("# Login")
 st.write("> Please log in to continue")
 
-# login form
+## login form ####
 with st.form("login_form"):
     email = st.text_input("Email", max_chars=50)
     password = st.text_input("Password", type="password", max_chars=100)
