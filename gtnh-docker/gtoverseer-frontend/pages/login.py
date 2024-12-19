@@ -13,7 +13,7 @@ def login(email, password):
             ss.logged_in = True
             ss.backlog_message = "Login successful"
         else:
-            ss.backlog_message ="Authentication failed"
+            ss.backlog_message ="Username or password is not valid."
     except Exception as e:
         ss.backlog_message = f"Login error: {e}"
 
