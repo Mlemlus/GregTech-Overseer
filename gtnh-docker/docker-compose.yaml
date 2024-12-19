@@ -88,13 +88,12 @@ services:
     build:
       context: ./postgres
       dockerfile: Dockerfile
-      args:
-        GTOVERSEER_POSTGRES_PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
     container_name: GTOverseer_postgre
     restart: ${RESTART_POLICY}
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      GTOVERSEER_POSTGRES_PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
       PGDATA: "${POSTGRES_DATA_DIRECTORY}"
     mem_limit: ${POSTGRES_MEM_LIMIT}
     mem_reservation: ${POSTGRES_MEM_RESERVATION}
