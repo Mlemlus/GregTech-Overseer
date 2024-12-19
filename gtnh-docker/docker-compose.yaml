@@ -43,6 +43,23 @@ services:
       backend:
           ipv4_address: 10.21.31.3
 
+  gtoverseer-frontend:
+    build:
+      context: ./gtoverseer-frontend
+      dockerfile: Dockerfile
+    container_name: GTOverseer_frontend
+    depends_on:
+      gtoverseer-backend:
+        condition: service_started
+    restart: ${RESTART_POLICY}
+    environment:
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
+    networks:
+      backend:
+        ipv4_address: 10.21.31.9
+      frontend:
+        ipv4_address: ${GTO_FRONTEND_IP}
+
   gtoverseer-backend:
     build:
       context: ./gtoverseer-backend
@@ -58,6 +75,9 @@ services:
       PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
       HOST: "10.22.32.4"
       PORT: "${POSTGRES_PORT}"
+      ADMIN_USERNAME: "${ADMIN_USERNAME}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
     networks:
       backend:
         ipv4_address: 10.21.31.5
@@ -68,13 +88,12 @@ services:
     build:
       context: ./postgres
       dockerfile: Dockerfile
-      args:
-        GTOVERSEER_POSTGRES_PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
     container_name: GTOverseer_postgre
     restart: ${RESTART_POLICY}
     environment:
       POSTGRES_USER: "${POSTGRES_USER}"
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      GTOVERSEER_POSTGRES_PASSWORD: "${GTOVERSEER_POSTGRES_PASSWORD}"
       PGDATA: "${POSTGRES_DATA_DIRECTORY}"
     mem_limit: ${POSTGRES_MEM_LIMIT}
     mem_reservation: ${POSTGRES_MEM_RESERVATION}
@@ -106,7 +125,7 @@ services:
       -c log_connections='on'
       -c log_disconnections='on'
       -c log_line_prefix='%m [%p]'
-      -c log_statement='ddl'
+      -c log_statement='all'
       -c log_line_prefix='%m [%p]'
       -c unix_socket_permissions='0770'
     volumes:

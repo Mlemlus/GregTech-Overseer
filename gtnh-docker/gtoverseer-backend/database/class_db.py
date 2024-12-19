@@ -19,7 +19,7 @@ class db:
         try:
             cur.execute(query, values) # Executes the query with the values
             self.conn.commit()
-            cur.close()
+            return True, None
         except Exception as e:
             self.conn.rollback() # rollback when error
             return False, e
@@ -50,6 +50,18 @@ class db:
         finally:
             cur.close()
     
+    def selectMultiple(self, query, value):
+        cur = self.conn.cursor()
+        try:
+            cur.execute(query, value)
+            val = cur.fetchone()
+            return val
+        except Exception as e:
+            self.conn.rollback()
+            return False, e
+        finally:
+            cur.close()
+
     def update(self, query, values):
         cur = self.conn.cursor()
         try:

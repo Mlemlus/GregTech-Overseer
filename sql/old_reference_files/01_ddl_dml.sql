@@ -31,8 +31,8 @@ CREATE TABLE "gtoverseer"."privilege" (
 
 CREATE TABLE "gtoverseer"."user" (
 	"ID"				SERIAL PRIMARY KEY,
-	"nickname"			VARCHAR(50) NOT NULL UNIQUE,
-	"email"				BYTEA UNIQUE,
+	"nickname"			VARCHAR(16) NOT NULL UNIQUE,
+	"email"				VARCHAR UNIQUE,
 	"password_hash"		CHAR(60)
 );
 
@@ -191,14 +191,14 @@ INSERT INTO "gtoverseer"."privilege" ("name") VALUES
 	('Manage Logs');
 
 -- example users
-INSERT INTO "gtoverseer"."user" ("nickname", "email", "password_hash") VALUES
-	('Meemlus', 'meemlus@email.cz', 'heslicko'),
-	('_Zyosh_', 'zyosh@email.cz', 'maslicko'),
-	('bobik', 'bobik@email.cz', 'jahoda'),
-	('pepik', 'jahodak@email.cz', 'svickova'),
-	('rostik', 'rostik@email.cz', 'smazak'),
-	('kolik', 'maverick@email.cz', 'spaneslky ptacek'),
-	('igor', 'igor@email.cz', 'spagety');
+-- INSERT INTO "gtoverseer"."user" ("nickname", "email", "password_hash") VALUES
+-- 	('Meemlus', 'meemlus@email.cz', 'heslicko'),
+-- 	('_Zyosh_', 'zyosh@email.cz', 'maslicko'),
+-- 	('bobik', 'bobik@email.cz', 'jahoda'),
+-- 	('pepik', 'jahodak@email.cz', 'svickova'),
+-- 	('rostik', 'rostik@email.cz', 'smazak'),
+-- 	('kolik', 'maverick@email.cz', 'spaneslky ptacek'),
+-- 	('igor', 'igor@email.cz', 'spagety');
 
 -- some example cables
 INSERT INTO "gtoverseer"."cable" ("name", "density", "tier_ID", "max_amp", "loss") VALUES
@@ -223,11 +223,34 @@ INSERT INTO "gtoverseer"."power_network" ("name", "cable_ID", "avg_amp", "avg_eu
 	('main west', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'TPV-Alloy Cable' AND "density" = '12'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "nickname" = 'igor'));
 
 
+------- VIEWS -----------
+CREATE OR REPLACE VIEW "gtoverseer"."machine_report" AS
+SELECT 
+m."ID" AS machine_id,
+m."name" AS machine_name,
+m."oc_address" AS oc_address,
+m."amp" AS machine_amp,
+m."created_at" AS machine_created_at,
+c."x" AS coord_x,
+c."y" AS coord_y,
+c."z" AS coord_z,
+c."is_chunk_loaded" AS is_chunk_loaded,
+case
+	WHEN  w."work_progress_max" = 0 then 0
+	else ((w."work_progress"::FLOAT / w."work_progress_max") * 100)
+end AS "work_progress",
+COALESCE(mm."is_fixed",TRUE) AS is_operational,
+pn."name" AS power_network_name
+FROM "gtoverseer"."machine" m
+LEFT JOIN "gtoverseer"."coord" c ON m."ID" = c."machine_ID"
+LEFT JOIN "gtoverseer"."work" w ON m."ID" = w."machine_ID"
+LEFT JOIN "gtoverseer"."machine_maintenance" mm ON m."ID" = mm."machine_ID"
+LEFT JOIN "gtoverseer"."power_network" pn ON m."power_network_ID" = pn."ID"
+WHERE m."is_connected" = TRUE;
+
 ------- PRIVILEGES -----------
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 DROP SCHEMA IF EXISTS public CASCADE;
-
-CREATE ROLE gtoverseer_app WITH LOGIN ENCRYPTED PASSWORD '${GTOVERSEER_POSTGRES_PASSWORD}';
 
 GRANT CONNECT ON DATABASE postgres TO gtoverseer_app;
 GRANT USAGE ON SCHEMA "gtoverseer" TO gtoverseer_app;
@@ -241,5 +264,3 @@ REVOKE DELETE ON "gtoverseer"."machine_maintenance" FROM gtoverseer_app;
 REVOKE DELETE ON "gtoverseer"."work" FROM gtoverseer_app;
 REVOKE DELETE ON "gtoverseer"."coord" FROM gtoverseer_app;
 REVOKE DELETE ON "gtoverseer"."power_source" FROM gtoverseer_app;
-
-

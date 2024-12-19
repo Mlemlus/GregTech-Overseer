@@ -8,4 +8,5 @@ RUN pip install --no-cache-dir flask psycopg2-binary
 COPY GTOverseer.py ./GTOverseer.py
 COPY data_process ./data_process
 COPY database ./database
+COPY api ./api
 CMD [ "python", "./GTOverseer.py" ]
