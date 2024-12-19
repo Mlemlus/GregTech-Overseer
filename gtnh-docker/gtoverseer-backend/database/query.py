@@ -1,21 +1,6 @@
 from database.class_db import db # idk if needed
 
-def selTiers(db):
-    return db.select('SELECT "ID", "name", "eu" FROM gtoverseer.tier')
-
-def selComputer(db, oc_address):
-    return db.selectSingle('SELECT "ID" FROM gtoverseer.oc_computer WHERE oc_address = %s', oc_address)
-
-def selMachine(db, oc_address):
-    return db.selectSingle('SELECT "ID" FROM gtoverseer.machine WHERE oc_address = %s', oc_address)
-
-def insComputer(db, kwargs):
-    # insert computah, if exist do nothing
-    if (oc_comp_id := selComputer(db, kwargs["computer_oc_address"])):
-        return oc_comp_id     
-    else:
-        return db.insert('INSERT INTO gtoverseer.oc_computer (oc_address) VALUES (%(computer_oc_address)s) RETURNING "ID"', kwargs)
-
+################## CREATE ##################
 def insMachine(db, kwargs):
     db.insert("""
         INSERT INTO gtoverseer.machine ("oc_computer_ID", "tier_ID", "owner_ID", oc_address, name, amp) 
@@ -63,22 +48,13 @@ def insWork(db, kwargs):
             "work_progress_max" = EXCLUDED."work_progress_max"
     """, kwargs)
 
-def updWork(db, kwargs):
-    db.insert("""
-        INSERT INTO gtoverseer.work ("machine_ID", work_progress, work_progress_max)
-        SELECT
-            m."ID" AS "machine_ID",
-            %(work_progress)s AS work_progress,
-            %(work_progress_max)s AS work_progress_max
-        FROM gtoverseer.machine m
-        WHERE m.oc_address = %(oc_address)s
-        ON CONFLICT ("machine_ID") DO UPDATE
-        SET
-            "work_progress" = EXCLUDED."work_progress", 
-            "work_progress_max" = EXCLUDED."work_progress_max",
-            "last_worked_at" = CURRENT_TIMESTAMP
-    """, kwargs)
-
+def insComputer(db, kwargs):
+    # insert computah, if exist do nothing
+    if (oc_comp_id := selComputer(db, kwargs["computer_oc_address"])):
+        return oc_comp_id     
+    else:
+        return db.insert('INSERT INTO gtoverseer.oc_computer (oc_address) VALUES (%(computer_oc_address)s) RETURNING "ID"', kwargs)
+    
 def insPowerSource(db, kwargs):
     db.insert("""
         INSERT INTO gtoverseer.power_source ("machine_ID", "output_amp", "current_capacity", "max_capacity")
@@ -93,15 +69,6 @@ def insPowerSource(db, kwargs):
             "current_capacity" = EXCLUDED."current_capacity",
             "max_capacity" = EXCLUDED."max_capacity"
     """, kwargs)
-
-def selUserNickname(db, nickname):
-    return db.selectSingle('SELECT ("ID") FROM gtoverseer.user WHERE nickname = %s', nickname)
-
-def selTier(db, voltage):
-    return db.selectSingle('SELECT ("ID") FROM gtoverseer.tier WHERE eu = %s', voltage)
-
-def machineReport(db):
-    return db.select("SELECT * FROM gtoverseer.machine_report")
 
 def insUser(db, kwargs):
     return db.insert("""
@@ -118,6 +85,26 @@ def insUser(db, kwargs):
             "password_hash" = EXCLUDED."password_hash"
         """, kwargs)
 
+
+################## READ ##################
+def selTiers(db):
+    return db.select('SELECT "ID", "name", "eu" FROM gtoverseer.tier')
+
+def selComputer(db, oc_address):
+    return db.selectSingle('SELECT "ID" FROM gtoverseer.oc_computer WHERE oc_address = %s', oc_address)
+
+def selMachine(db, oc_address):
+    return db.selectSingle('SELECT "ID" FROM gtoverseer.machine WHERE oc_address = %s', oc_address)
+
+def selUserNickname(db, nickname):
+    return db.selectSingle('SELECT ("ID") FROM gtoverseer.user WHERE nickname = %s', nickname)
+
+def selTier(db, voltage):
+    return db.selectSingle('SELECT ("ID") FROM gtoverseer.tier WHERE eu = %s', voltage)
+
+def machineReport(db):
+    return db.select("SELECT * FROM gtoverseer.machine_report")
+
 def selUserEmailPassword(db, kwargs):
     return db.selectMultiple("""
         SELECT "nickname" FROM gtoverseer.user 
@@ -126,3 +113,23 @@ def selUserEmailPassword(db, kwargs):
             AND
             password_hash = gtoverseer.crypt(%(password)s, password_hash)
         """, kwargs)
+
+
+################## UPDATE ##################
+def updWork(db, kwargs):
+    db.insert("""
+        INSERT INTO gtoverseer.work ("machine_ID", work_progress, work_progress_max)
+        SELECT
+            m."ID" AS "machine_ID",
+            %(work_progress)s AS work_progress,
+            %(work_progress_max)s AS work_progress_max
+        FROM gtoverseer.machine m
+        WHERE m.oc_address = %(oc_address)s
+        ON CONFLICT ("machine_ID") DO UPDATE
+        SET
+            "work_progress" = EXCLUDED."work_progress", 
+            "work_progress_max" = EXCLUDED."work_progress_max",
+            "last_worked_at" = CURRENT_TIMESTAMP
+    """, kwargs)
+
+################## DELETE ##################
