@@ -31,7 +31,7 @@ CREATE TABLE "gtoverseer"."privilege" (
 
 CREATE TABLE "gtoverseer"."user" (
 	"ID"				SERIAL PRIMARY KEY,
-	"nickname"			VARCHAR(16) NOT NULL UNIQUE,
+	"username"			VARCHAR(16) NOT NULL UNIQUE,
 	"email"				VARCHAR UNIQUE,
 	"password_hash"		CHAR(60)
 );

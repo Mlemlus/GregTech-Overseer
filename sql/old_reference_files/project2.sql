@@ -30,7 +30,7 @@ SELECT SUBSTRING("name" FROM POSITION('.' IN "name") + 1) AS "multimachine type"
 	FROM gtoverseer.machine WHERE "name" LIKE 'multimachine%';
 SELECT TRIM('     nejaky text  ') AS "string"  -- doslova vsechny hodnoty jsou perfektni
 SELECT CONCAT(time,': ', text) AS "log" FROM gtoverseer.log
-SELECT m.name, COALESCE(u."nickname", 'No owner') AS "owner" FROM gtoverseer.machine m 
+SELECT m.name, COALESCE(u."username", 'No owner') AS "owner" FROM gtoverseer.machine m 
 	LEFT JOIN gtoverseer.user u ON m."owner_ID" = u."ID"
 
 -- (d) SUM; MIN; MAX; AVG;
@@ -102,7 +102,7 @@ LEFT JOIN gtoverseer.machine m ON ps."machine_ID" = m."ID"
 SELECT m.name, ps.output_amp FROM gtoverseer.power_source ps
 RIGHT JOIN gtoverseer.machine m ON ps."machine_ID" = m."ID"
 -- FULL OUTER JOIN;
-SELECT m.name, u.nickname FROM gtoverseer.machine m
+SELECT m.name, u.username FROM gtoverseer.machine m
 FULL OUTER JOIN gtoverseer.user u ON m."owner_ID" = u."ID"
 -- NATURAL JOIN
 ALTER TABLE gtoverseer.machine RENAME COLUMN "ID" TO "machine_ID"
@@ -223,7 +223,7 @@ t."name" AS "tier",
 ((w."work_progress"::FLOAT / w."work_progress_max") * 100) AS "progress",
 COALESCE(ps.output_amp, 0) AS "output amp",
 oc."oc_address" AS "controller address",
-u."nickname" AS "owner"
+u."username" AS "owner"
 FROM gtoverseer.machine m
 LEFT JOIN gtoverseer.coord c ON m."ID" = c."machine_ID"
 LEFT JOIN gtoverseer.work w ON m."ID" = w."machine_ID"
@@ -391,7 +391,7 @@ UPDATE gtoverseer.user SET email_enc = gtoverseer.pgp_sym_encrypt(email, 'klicen
 
 UPDATE gtoverseer.user SET "password_hash" = gtoverseer.crypt("password", gtoverseer.gen_salt('bf')) 
 
-SELECT nickname, gtoverseer.pgp_sym_decrypt(email_enc, 'klicenka') AS email_dec
+SELECT username, gtoverseer.pgp_sym_decrypt(email_enc, 'klicenka') AS email_dec
 FROM gtoverseer.user 
 WHERE password_hash = gtoverseer.crypt('heslo', password_hash)
 

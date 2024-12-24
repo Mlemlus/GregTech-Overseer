@@ -3,9 +3,11 @@ from database.class_db import db as Database
 import json, uuid, os
 from data_process.data_parse import parseIntialData
 from data_process.data_processes import insRestart, updWork
-from api.add import addUser
-from api.get import loginProcess
-import sys #######################
+import api.add as add
+import api.get as get
+import api.upd as upd
+import api.dele as dele # damn you del
+import sys
 
 app = Flask(__name__)
 
@@ -66,40 +68,98 @@ def handlePostRequest():
 
 
 ############ Frontend handling ############
-@app.route('/api/authenticate', methods=['POST'])
+##### USER #####
+@app.route('/api/authenticate', methods=['POST']) # user login auth process
 def handleApiAuthRequest():
-    data = request.json
-    db = Database(conn_params) # open db connection
-    response = loginProcess(db, data['email'], data['password'])
-    return jsonify(response) # returns dict with login info
+    try:
+        data = request.json
+        db = Database(conn_params) # open db connection
+        response = get.loginProcess(db, data['email'], data['password'])
+        return jsonify(response) # returns dict with login info
+    except Exception as e:
+        print(f"POST /api/authenticate: {e}", file=sys.stderr)
+        data = {'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
 
-    # try:
-    #     db = Database(conn_params) # open db connection
-    #     return jsonify(loginProcess(db, data['email'], data['password'])) # returns dict with login info
-    # except Exception as e:
-    #     print(f"POST /api/authenticate: {e}", file=sys.stderr)
-    #     data = {'error': str(e)}
-    #     return jsonify(data)
-    # finally:
-    #     del db
-
-@app.route('/api/add/user', methods=['POST'])
+@app.route('/api/add/user', methods=['POST']) # add user
 def handleApiAddUserRequest():
     data = request.data
     if isinstance(data, bytes):
         data = str(data.decode('utf-8'))
         data = json.loads(data)
-
     try:
         db = Database(conn_params) # open db connection
-        addUser(db, data['username'], data['email'], data['password'])
-        return jsonify({'status':True}) # returns dict with login info
+        add.addUser(db, data['username'], data['email'], data['password'])
+        return jsonify({'status':True})
     except Exception as e:
         print(f"POST /api/add/user: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
         return jsonify(data)
     finally:
         del db
+
+@app.route('/api/get/users', methods=['GET']) # get all users
+def handleApiGetUsersRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getUsers(db))
+    except Exception as e:
+        print(f"GET /api/get/users: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/get/user', methods=['POST']) # get user
+def handleApiGetUserRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getUser(db,data['username']))
+    except Exception as e:
+        print(f"POST /api/get/user: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/update/user', methods=['POST']) # update user
+def handleApiUpdateUserRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(upd.updUser(db, data['old_username'], data['username'], data['email']))
+    except Exception as e:
+        print(f"POST /api/update/user: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/delete/user', methods=['POST']) # delete user
+def handleApiDeleteUserRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(dele.delUser(db, data['username']))
+    except Exception as e:
+        print(f"POST /api/delete/user: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
 
 
 if __name__ == '__main__':
@@ -114,7 +174,7 @@ if __name__ == '__main__':
     # if we add the admin account every time, it has to exist (it gets updated on conflict)
     try:
         db = Database(conn_params) # open db connection
-        addUser(db, os.getenv("ADMIN_USERNAME"),os.getenv("ADMIN_EMAIL"),os.getenv("ADMIN_PASSWORD"))
+        add.addUser(db, os.getenv("ADMIN_USERNAME"),os.getenv("ADMIN_EMAIL"),os.getenv("ADMIN_PASSWORD"))
     except Exception as e:
         print(f"main: no database connection: {e}", file=sys.stderr)
     finally:

@@ -7,7 +7,7 @@ def insMachine(db, kwargs):
         VALUES 
             (%(oc_computer_ID)s, 
             %(tier_ID)s, 
-            (SELECT "ID" FROM gtoverseer.user WHERE nickname = %(owner_name)s), 
+            (SELECT "ID" FROM gtoverseer.user WHERE username = %(owner_name)s), 
             %(oc_address)s, 
             %(name)s, 
             %(amp)s)
@@ -72,15 +72,15 @@ def insPowerSource(db, kwargs):
 
 def insUser(db, kwargs):
     return db.insert("""
-        INSERT INTO gtoverseer.user ("nickname", "email", "password_hash")
+        INSERT INTO gtoverseer.user ("username", "email", "password_hash")
         VALUES (
-            %(nickname)s,
+            %(username)s,
             %(email)s, 
             gtoverseer.crypt(%(password)s, gtoverseer.gen_salt('bf'))
         )
-        ON CONFLICT ("nickname") DO UPDATE
+        ON CONFLICT ("username") DO UPDATE
         SET
-            "nickname" = EXCLUDED."nickname",
+            "username" = EXCLUDED."username",
             "email" = EXCLUDED."email",
             "password_hash" = EXCLUDED."password_hash"
         """, kwargs)
@@ -96,24 +96,40 @@ def selComputer(db, oc_address):
 def selMachine(db, oc_address):
     return db.selectSingle('SELECT "ID" FROM gtoverseer.machine WHERE oc_address = %s', oc_address)
 
-def selUserNickname(db, nickname):
-    return db.selectSingle('SELECT ("ID") FROM gtoverseer.user WHERE nickname = %s', nickname)
-
 def selTier(db, voltage):
     return db.selectSingle('SELECT ("ID") FROM gtoverseer.tier WHERE eu = %s', voltage)
 
 def machineReport(db):
     return db.select("SELECT * FROM gtoverseer.machine_report")
 
+# User
+def selUserUsername(db, username):
+    return db.selectSingle('SELECT ("ID") FROM gtoverseer.user WHERE username = %s', username)
+
 def selUserEmailPassword(db, kwargs):
     return db.selectMultiple("""
-        SELECT "nickname" FROM gtoverseer.user 
+        SELECT "username" FROM gtoverseer.user 
         WHERE 
             email = %(email)s
             AND
             password_hash = gtoverseer.crypt(%(password)s, password_hash)
         """, kwargs)
 
+def selAllUsers(db):
+    return db.select(
+        """
+        SELECT "username", "email"
+        FROM gtoverseer.user
+        ORDER BY "username"
+        """)
+
+def searchUsers(db, kwargs):
+    return db.selectMultiple(
+        """
+        SELECT "ID", "username", "email"
+        FROM gtoverseer.user
+        WHERE username = %(search)s OR email = %(search)s
+        """, kwargs)
 
 ################## UPDATE ##################
 def updWork(db, kwargs):
@@ -132,4 +148,29 @@ def updWork(db, kwargs):
             "last_worked_at" = CURRENT_TIMESTAMP
     """, kwargs)
 
+def updateUser(db, kwargs): # sometimes, my genius scares me
+    return db.update(
+        """
+        UPDATE gtoverseer.user
+        SET
+            "username" = %(username)s,
+            "email" = %(email)s
+        WHERE "username" = %(old_username)s
+        AND(
+            %(username)s = %(old_username)s 
+            OR
+            NOT EXISTS(
+                SELECT 1 
+                FROM gtoverseer.user
+                WHERE "username" = %(username)s
+            )
+        )
+        """, kwargs)
+
 ################## DELETE ##################
+def deleteUser(db, kwargs):
+    return db.delete(
+        """
+        DELETE FROM gtoverseer.user
+        WHERE "username" = %(username)s
+        """, kwargs)

@@ -31,7 +31,7 @@ CREATE TABLE "db"."privilege" (
 
 CREATE TABLE "db"."user" (
 	"ID"				SERIAL PRIMARY KEY,
-	"nickname"			VARCHAR(50) NOT NULL UNIQUE,
+	"username"			VARCHAR(50) NOT NULL UNIQUE,
     "username"			VARCHAR(100),
     "password_hash"		CHAR(64)
 );
