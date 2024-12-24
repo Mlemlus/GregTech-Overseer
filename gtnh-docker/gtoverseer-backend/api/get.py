@@ -31,3 +31,20 @@ def searchUsers(db, search_term):
         return {'status':True, 'users':users}
     else:
         return {'status':False, 'users':{}}
+    
+##### MACHINE #####
+def getMachines(db):
+    machines = q.machineReport(db)
+    if machines:
+        return {'status':True, 'machines':machines}
+    else:
+        return {'status':False, 'machines':{"upsieWoopsie"}}
+
+
+##### POWER NETWORK #####
+def getPowerNetworkNames(db):
+    power_networks = q.selAllNetowrksNames(db)
+    if power_networks:
+        return {'status':True, 'pnnames':power_networks}
+    else:
+        return {'status':False, 'pnnames':{"upsieWoopsie"}}

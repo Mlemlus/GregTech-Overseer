@@ -99,9 +99,6 @@ def selMachine(db, oc_address):
 def selTier(db, voltage):
     return db.selectSingle('SELECT ("ID") FROM gtoverseer.tier WHERE eu = %s', voltage)
 
-def machineReport(db):
-    return db.select("SELECT * FROM gtoverseer.machine_report")
-
 # User
 def selUserUsername(db, username):
     return db.selectSingle('SELECT ("ID") FROM gtoverseer.user WHERE username = %s', username)
@@ -131,6 +128,22 @@ def searchUsers(db, kwargs):
         WHERE username = %(search)s OR email = %(search)s
         """, kwargs)
 
+# Machine
+def machineReport(db):
+    return db.select(
+        """
+        SELECT * 
+        FROM gtoverseer.machine_report
+        """)
+
+# Power network
+def selAllNetowrksNames(db):
+    return db.select(
+        """
+        SELECT "name"
+        FROM gtoverseer.power_network
+        """)
+
 ################## UPDATE ##################
 def updWork(db, kwargs):
     db.insert("""
@@ -148,6 +161,7 @@ def updWork(db, kwargs):
             "last_worked_at" = CURRENT_TIMESTAMP
     """, kwargs)
 
+# User
 def updateUser(db, kwargs): # sometimes, my genius scares me
     return db.update(
         """
@@ -165,6 +179,26 @@ def updateUser(db, kwargs): # sometimes, my genius scares me
                 WHERE "username" = %(username)s
             )
         )
+        """, kwargs)
+
+# Machine
+def updateMachine(db, kwargs):
+    return db.update(
+        """
+        UPDATE gtoverseer.machine
+        SET
+            "custom_name" = %(name)s,
+            "note" = %(note)s,
+            "power_network_ID" = (
+                SELECT "ID"
+                FROM gtoverseer."power_network"
+                WHERE "name" = %(pnname)s
+            )
+        WHERE "ID" = %(ID)s;
+        UPDATE gtoverseer."coord"
+        SET
+            "is_chunk_loaded" = %(chunkloaded)s
+        WHERE "machine_ID" = %(ID)s
         """, kwargs)
 
 ################## DELETE ##################

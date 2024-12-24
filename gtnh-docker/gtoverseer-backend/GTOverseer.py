@@ -160,6 +160,48 @@ def handleApiDeleteUserRequest():
     finally:
         del db
 
+##### MACHINE #####
+@app.route('/api/get/machines', methods=['GET']) # get all machines
+def handleApiGetMachinesRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getMachines(db))
+    except Exception as e:
+        print(f"GET /api/get/machines: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/update/machine', methods=['POST']) # update machine
+def handleApiUpdateMachineRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(upd.updMachine(db, data['ID'], data['name'], data['pnname'], data['chunkloaded'], data['note']))
+    except Exception as e:
+        print(f"POST /api/update/machine: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+
+##### POWER NETWORK #####
+@app.route('/api/get/power-network-names', methods=['GET']) # get all PN names
+def handleApiGetPowerNetworkNamesRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getPowerNetworkNames(db))
+    except Exception as e:
+        print(f"GET /api/get/power-network-names: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
 
 
 if __name__ == '__main__':
