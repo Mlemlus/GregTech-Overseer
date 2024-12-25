@@ -40,6 +40,13 @@ def getMachines(db):
     else:
         return {'status':False, 'machines':{"upsieWoopsie"}}
 
+def searchMachines(db, kwargs):
+    kwargs["wild_search"] = "%" + kwargs["search"] + "%" # prep the search
+    status, machines = q.selSearchMachines(db, kwargs)
+    if status:
+        return {'status':True, 'machines':machines}
+    else:
+        return {'status':False, 'error':machines, 'machines':{"upsieWoopsie"}}
 
 ##### POWER NETWORK #####
 def getPowerNetworkNames(db):

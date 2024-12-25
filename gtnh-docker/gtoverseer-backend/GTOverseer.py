@@ -173,6 +173,22 @@ def handleApiGetMachinesRequest():
     finally:
         del db
 
+@app.route('/api/search/machines', methods=['POST']) # get searched machines
+def handleApiSearchMachinesRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.searchMachines(db,data))
+    except Exception as e:
+        print(f"POST /api/search/machines: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
 @app.route('/api/update/machine', methods=['POST']) # update machine
 def handleApiUpdateMachineRequest():
     data = request.data

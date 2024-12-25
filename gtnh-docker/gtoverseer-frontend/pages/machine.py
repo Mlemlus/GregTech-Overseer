@@ -44,11 +44,20 @@ st.write("# Machines")
 
 ## select machines form ##
 st.write("### List of machines")
-response = requests.get("http://10.21.31.5:40649/api/get/machines")
-if not response.json()["status"]:
-    st.error("No machines, are your OC stations set up correctly?")
-    st.stop()
-df = pd.DataFrame(response.json()["machines"], columns=["ID", "Name", "Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"])
+search = st.text_input("Search", max_chars=100)
+if search:
+    response = requests.post("http://10.21.31.5:40649/api/search/machines", json={'search':search})
+    if not response.json()["status"]:
+        st.write(response.json()["error"])
+        st.error("No machines, are your OC stations set up correctly?")
+        st.stop()
+    df = pd.DataFrame(response.json()["machines"], columns=["ID", "Name", "Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"])
+else:
+    response = requests.get("http://10.21.31.5:40649/api/get/machines")
+    if not response.json()["status"]:
+        st.error("No machines, are your OC stations set up correctly?")
+        st.stop()
+    df = pd.DataFrame(response.json()["machines"], columns=["ID", "Name", "Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"])
 
 # Filters
 filters = ["ID", "Name","Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"] 
