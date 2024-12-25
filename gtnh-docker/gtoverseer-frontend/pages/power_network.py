@@ -95,7 +95,8 @@ with st.container(height=300):
         col1, col2, col3, col4, col5, col6 = st.columns(6)
         col1.write(row["Name"])
         col2.write(row["Cable"])
-        col3.write(datetime.strptime(row["Created at"], "%a, %d %b %Y %H:%M:%S %Z").strftime("%d %b %Y")) # just the date
+        if not row["Created at"] == '':
+            col3.write(datetime.strptime(row["Created at"], "%a, %d %b %Y %H:%M:%S %Z").strftime("%d %b %Y")) # just the date
         col4.write(row["Owner"])
 
         if not row["Name"] == '': # display buttons if we got any pns
