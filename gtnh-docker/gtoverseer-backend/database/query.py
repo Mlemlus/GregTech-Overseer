@@ -103,6 +103,28 @@ def insCable(db, kwargs):
         ON CONFLICT ("name") DO NOTHING
         """, kwargs)
 
+# Power Network
+def insPowerNetwork(db, kwargs):
+    return db.insert("""
+        INSERT INTO gtoverseer."power_network" ("name", "cable_ID", "owner_ID", "avg_amp", "avg_eu")
+        VALUES (
+            %(name)s,
+            (
+                SELECT "ID"
+                FROM gtoverseer.cable
+                WHERE "name" = %(cable_name)s
+            ),
+            (
+                SELECT "ID"
+                FROM gtoverseer.user
+                WHERE "username" = %(username)s
+            ),
+            0,
+            0
+        )
+        ON CONFLICT ("name") DO NOTHING
+        """, kwargs)
+
 ################## READ ##################
 # OC Computer
 def selComputer(db, oc_address):
@@ -156,6 +178,16 @@ def selAllNetowrksNames(db):
         FROM gtoverseer.power_network
         """)
 
+def selAllPowerNetworks(db):
+    return db.select(
+        """
+        SELECT pn."name", c."name", pn."created_at", u."username"
+        FROM gtoverseer."power_network" pn
+        LEFT JOIN gtoverseer.cable c ON pn."cable_ID" = c."ID"
+        LEFT JOIN gtoverseer.user u ON pn."owner_ID" = u."ID"
+        ORDER BY pn."name"
+        """)
+
 # Cable
 def selAllCables(db):
     return db.select(
@@ -164,6 +196,14 @@ def selAllCables(db):
         FROM gtoverseer.cable c
         LEFT JOIN gtoverseer.tier t ON c."tier_ID" = t."ID"
         ORDER BY c."name"
+        """)
+
+def selAllCablesNames(db):
+    return db.select(
+        """
+        SELECT "name"
+        FROM gtoverseer.cable
+        ORDER BY "name"
         """)
 
 # Tier
@@ -255,6 +295,21 @@ def updateCable(db, kwargs):
         WHERE "name" = %(old_name)s
         """, kwargs)
 
+# Power Network
+def updatePowerNetwork(db, kwargs):
+    return db.update(
+        """
+        UPDATE gtoverseer."power_network"
+        SET
+            "name" = %(name)s,
+            "cable_ID" =(
+                SELECT "ID"
+                FROM gtoverseer.cable
+                WHERE "name" = %(cable_name)s
+            )
+        WHERE "name" = %(old_name)s
+        """, kwargs)
+
 ################## DELETE ##################
 def deleteUser(db, kwargs):
     return db.delete(
@@ -267,5 +322,12 @@ def deleteCable(db, kwargs):
     return db.delete(
     """
     DELETE FROM gtoverseer.cable
+    WHERE "name" = %(name)s
+    """, kwargs)
+
+def deletePowerNetwork(db, kwargs):
+    return db.delete(
+    """
+    DELETE FROM gtoverseer."power_network"
     WHERE "name" = %(name)s
     """, kwargs)

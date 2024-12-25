@@ -25,3 +25,8 @@ def updCable(db, data):
     q.updateCable(db, data)
     return {'status':True}
 
+##### POWER NETWORK #####
+def updPN(db, data):
+    q.updatePowerNetwork(db, data)
+    return {'status':True}
+

@@ -203,6 +203,68 @@ def handleApiGetPowerNetworkNamesRequest():
     finally:
         del db
 
+@app.route('/api/add/power-network', methods=['POST']) # add poewr network
+def handleApiAddPowerNetworkRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        add.addPN(db, data)
+        return jsonify({'status':True})
+    except Exception as e:
+        print(f"POST /api/add/power-network: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/get/power-networks', methods=['GET']) # get all cables
+def handleApiGetPowerNetworksRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getPNs(db))
+    except Exception as e:
+        print(f"GET /api/get/power-netowrks: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/update/power-network', methods=['POST']) # update power network
+def handleApiUpdatePowerNetworkRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(upd.updPN(db, data))
+    except Exception as e:
+        print(f"POST /api/update/cable: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/delete/power-network', methods=['POST']) # delete PN
+def handleApiDeletePowerNetworkRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(dele.delPN(db, data))
+    except Exception as e:
+        print(f"POST /api/delete/power-network: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+
 ##### CABLE #####
 @app.route('/api/add/cable', methods=['POST']) # add cable
 def handleApiAddCableRequest():
@@ -228,6 +290,18 @@ def handleApiGetCablesRequest():
         return jsonify(get.getCables(db))
     except Exception as e:
         print(f"GET /api/get/cables: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/get/cable-names', methods=['GET']) # get all cable names
+def handleApiGetCableNamesRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getCableNames(db))
+    except Exception as e:
+        print(f"GET /api/get/cable-names: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
         return jsonify(data)
     finally:

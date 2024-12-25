@@ -22,5 +22,13 @@ def addCable(db, name, density, tier_name, max_amp, loss):
     if status:
         return {'status':True}
     else:
-        print(f"addUser: {err}", file=sys.stderr)
+        print(f"addCable: {err}", file=sys.stderr)
+        return {'status':False}
+    
+def addPN(db, data):
+    status, err = q.insPowerNetwork(db,data)
+    if status:
+        return {'status':True}
+    else:
+        print(f"addPN: {err}", file=sys.stderr)
         return {'status':False}

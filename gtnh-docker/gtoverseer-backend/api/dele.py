@@ -9,3 +9,9 @@ def delUser(db, username):
 def delCable(db, name):
     q.deleteCable(db, {"name": str(name)})
     return {'status':True}
+
+##### POWER NETWORK #####
+def delPN(db, data):
+    q.deletePowerNetwork(db, data)
+    return {'status':True}
+
