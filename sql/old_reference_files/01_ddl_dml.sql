@@ -31,7 +31,7 @@ CREATE TABLE "gtoverseer"."privilege" (
 
 CREATE TABLE "gtoverseer"."user" (
 	"ID"				SERIAL PRIMARY KEY,
-	"nickname"			VARCHAR(16) NOT NULL UNIQUE,
+	"username"			VARCHAR(16) NOT NULL UNIQUE,
 	"email"				VARCHAR UNIQUE,
 	"password_hash"		CHAR(60)
 );
@@ -191,7 +191,7 @@ INSERT INTO "gtoverseer"."privilege" ("name") VALUES
 	('Manage Logs');
 
 -- example users
--- INSERT INTO "gtoverseer"."user" ("nickname", "email", "password_hash") VALUES
+-- INSERT INTO "gtoverseer"."user" ("username", "email", "password_hash") VALUES
 -- 	('Meemlus', 'meemlus@email.cz', 'heslicko'),
 -- 	('_Zyosh_', 'zyosh@email.cz', 'maslicko'),
 -- 	('bobik', 'bobik@email.cz', 'jahoda'),
@@ -215,12 +215,12 @@ INSERT INTO "gtoverseer"."cable" ("name", "density", "tier_ID", "max_amp", "loss
 
 -- example power_networks
 INSERT INTO "gtoverseer"."power_network" ("name", "cable_ID", "avg_amp", "avg_eu", "owner_ID") VALUES
-	('bees', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'Gold Cable' AND "density" = '16'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "nickname" = 'Meemlus')),
-	('nuclear subnet', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'TPV-Alloy Cable' AND "density" = '12'), 38.7, 79257.6, (SELECT "ID" FROM "gtoverseer"."user" WHERE "nickname" = 'bobik')),
-	('main north', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'Platinum Cable' AND "density" = '16'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "nickname" = 'bobik')),
-	('main east', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'TPV-Alloy Cable' AND "density" = '12'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "nickname" = 'bobik')),
-	('main south', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'Platinum Cable' AND "density" = '16'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "nickname" = 'bobik')),
-	('main west', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'TPV-Alloy Cable' AND "density" = '12'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "nickname" = 'igor'));
+	('bees', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'Gold Cable' AND "density" = '16'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "username" = 'Meemlus')),
+	('nuclear subnet', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'TPV-Alloy Cable' AND "density" = '12'), 38.7, 79257.6, (SELECT "ID" FROM "gtoverseer"."user" WHERE "username" = 'bobik')),
+	('main north', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'Platinum Cable' AND "density" = '16'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "username" = 'bobik')),
+	('main east', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'TPV-Alloy Cable' AND "density" = '12'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "username" = 'bobik')),
+	('main south', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'Platinum Cable' AND "density" = '16'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "username" = 'bobik')),
+	('main west', (SELECT "ID" FROM "gtoverseer"."cable" WHERE "name" = 'TPV-Alloy Cable' AND "density" = '12'), NULL, NULL, (SELECT "ID" FROM "gtoverseer"."user" WHERE "username" = 'igor'));
 
 
 ------- VIEWS -----------

@@ -3,7 +3,7 @@ WORKDIR /minecraft
 
 # update, install unzip
 RUN apt update && apt upgrade -y
-RUN apt install -y unzip && apt clean
+RUN apt install -y unzip dos2unix && apt clean
 
 # install the server from gtnh_server.zip
 COPY gtnh_server.zip /minecraft/gtnh_server.zip 
@@ -22,6 +22,8 @@ RUN if [ -f /minecraft/backup.zip ]; then \
 # Copy the custom prepared configs
 COPY minecraft /minecraft
 
+# Take months to debug why scripts dont work
+RUN dos2unix /minecraft/start.sh
 # Make the start script executable
 RUN chmod +x /minecraft/start.sh
 

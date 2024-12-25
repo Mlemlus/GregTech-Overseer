@@ -31,7 +31,7 @@ CREATE TABLE "gtoverseer"."privilege" (
 
 CREATE TABLE "gtoverseer"."user" (
 	"ID"				SERIAL PRIMARY KEY,
-	"nickname"			VARCHAR(16) NOT NULL UNIQUE,
+	"username"			VARCHAR(16) NOT NULL UNIQUE,
 	"email"				VARCHAR UNIQUE,
 	"password_hash"		CHAR(60)
 );
@@ -127,6 +127,7 @@ CREATE TABLE "gtoverseer"."power_source" (
 	"output_amp"			INT NOT NULL,
 	"current_capacity"		BIGINT NOT NULL,
 	"max_capacity"			BIGINT NOT NULL,
+	"manual"				BOOLEAN NOT NULL DEFAULT FALSE,
 
 	FOREIGN KEY ("machine_ID") REFERENCES "gtoverseer"."machine"("ID") ON DELETE CASCADE
 );
