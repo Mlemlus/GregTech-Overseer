@@ -30,3 +30,7 @@ def updPN(db, data):
     q.updatePowerNetwork(db, data)
     return {'status':True}
 
+##### POWER SOURCE #####
+def updPS(db, data):
+    q.updatePowerSource(db, data)
+    return {'status':True}

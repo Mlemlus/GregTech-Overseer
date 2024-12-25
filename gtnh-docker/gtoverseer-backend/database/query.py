@@ -63,6 +63,7 @@ def insPowerSource(db, kwargs):
             %(output_amp)s, 
             %(eu_capacity_current)s,    
             %(eu_capacity)s)
+        WHERE "manual" = FALSE
         ON CONFLICT ("machine_ID") DO UPDATE
         SET 
             "output_amp" = EXCLUDED."output_amp", 
@@ -124,6 +125,24 @@ def insPowerNetwork(db, kwargs):
         )
         ON CONFLICT ("name") DO NOTHING
         """, kwargs)
+
+# Power source
+def insPowerSourceManual(db, kwargs):
+    db.insert("""
+        INSERT INTO gtoverseer.power_source ("machine_ID", "output_amp", "current_capacity", "max_capacity", "manual")
+        VALUES 
+            (%(machine_ID)s,
+            %(output_amp)s,
+            %(current_capacity)s,
+            %(max_capacity)s,
+            %(manual)s)
+        ON CONFLICT ("machine_ID") DO UPDATE
+        SET 
+            "output_amp" = EXCLUDED."output_amp",
+            "current_capacity" = EXCLUDED."current_capacity",
+            "max_capacity" = EXCLUDED."max_capacity",
+            "manual" = EXCLUDED."manual"
+    """, kwargs)
 
 ################## READ ##################
 # OC Computer
@@ -220,6 +239,28 @@ def selAllTierNames(db):
         FROM gtoverseer.tier
         """)
 
+# Power sources
+def selAllPowerSources(db):
+    return db.select(
+        """
+        SELECT COALESCE(m."custom_name", m."name"), t."name", ps."output_amp", pn."name", ps."current_capacity", ps."max_capacity", m."ID", ps."manual"
+        FROM gtoverseer."power_source" ps
+        LEFT JOIN gtoverseer.machine m ON ps."machine_ID" = m."ID"
+        LEFT JOIN "gtoverseer"."tier" t ON m."tier_ID" = t."ID"
+        LEFT JOIN "gtoverseer"."power_network" pn ON m."power_network_ID" = pn."ID"
+        ORDER BY COALESCE(m."custom_name", m."name")
+        """)
+
+def selPowerSource(db, kwargs):
+    return db.selectMultiple(
+        """
+        SELECT COALESCE(m."custom_name", m."name"), ps."output_amp", ps."max_capacity", m."note", pn."name"
+        FROM gtoverseer."power_source" ps
+        LEFT JOIN gtoverseer.machine m ON ps."machine_ID" = m."ID"
+        LEFT JOIN "gtoverseer"."power_network" pn ON m."power_network_ID" = pn."ID"
+        WHERE ps."machine_ID" = %(machine_ID)s
+        """, kwargs)
+
 ################## UPDATE ##################
 def updWork(db, kwargs):
     db.insert("""
@@ -310,6 +351,28 @@ def updatePowerNetwork(db, kwargs):
         WHERE "name" = %(old_name)s
         """, kwargs)
 
+# Power source
+def updatePowerSource(db, kwargs):
+    return db.update(
+        """
+        UPDATE gtoverseer."power_source"
+        SET
+            "output_amp" = %(output_amp)s,
+            "max_capacity" = %(max_capacity)s,
+            "manual" = %(manual)s
+        WHERE "machine_ID" = %(machine_ID)s;
+        UPDATE gtoverseer.machine
+        SET
+            "custom_name" = %(name)s,
+            "note" = %(note)s,
+            "power_network_ID" = (
+                SELECT "ID"
+                FROM gtoverseer."power_network"
+                WHERE "name" = %(pnname)s
+            )
+        WHERE "ID" = %(machine_ID)s;
+        """, kwargs)
+
 ################## DELETE ##################
 def deleteUser(db, kwargs):
     return db.delete(
@@ -330,4 +393,11 @@ def deletePowerNetwork(db, kwargs):
     """
     DELETE FROM gtoverseer."power_network"
     WHERE "name" = %(name)s
+    """, kwargs)
+
+def deletePowerSource(db, kwargs):
+    return db.delete(
+    """
+    DELETE FROM gtoverseer."power_source"
+    WHERE "machine_ID" = %(machine_ID)s
     """, kwargs)

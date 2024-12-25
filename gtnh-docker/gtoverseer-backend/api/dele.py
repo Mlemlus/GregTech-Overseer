@@ -15,3 +15,9 @@ def delPN(db, data):
     q.deletePowerNetwork(db, data)
     return {'status':True}
 
+##### POWER SOURCE #####
+def delPS(db, data):
+    q.deletePowerSource(db, data)
+    return {'status':True}
+
+

@@ -32,3 +32,11 @@ def addPN(db, data):
     else:
         print(f"addPN: {err}", file=sys.stderr)
         return {'status':False}
+    
+def addPS(db, data):
+    status, err = q.insPowerSourceManual(db,data)
+    if status:
+        return {'status':True}
+    else:
+        print(f"addPN: {err}", file=sys.stderr)
+        return {'status':False}

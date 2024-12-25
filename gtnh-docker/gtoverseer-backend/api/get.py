@@ -78,3 +78,18 @@ def getTierNames(db):
         return {'status':True, 'tiers':tiers}
     else:
         return {'status':False, 'tiers':{"upsieWoopsie"}}
+
+##### POWER SOURCE #####
+def getPSs(db):
+    pss = q.selAllPowerSources(db)
+    if pss:
+        return {'status':True, 'pss':pss}
+    else:
+        return {'status':False, 'pss':{"upsieWoopsie"}}
+
+def getPS(db, kwargs):
+    ps = q.selPowerSource(db, kwargs)
+    if ps:
+        return {'status':True, 'ps':ps}
+    else:
+        return {'status':False, 'ps':{"upsieWoopsie"}}

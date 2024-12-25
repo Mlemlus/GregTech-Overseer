@@ -220,13 +220,13 @@ def handleApiAddPowerNetworkRequest():
     finally:
         del db
 
-@app.route('/api/get/power-networks', methods=['GET']) # get all cables
+@app.route('/api/get/power-networks', methods=['GET']) # get all pns
 def handleApiGetPowerNetworksRequest():
     try:
         db = Database(conn_params) # open db connection
         return jsonify(get.getPNs(db))
     except Exception as e:
-        print(f"GET /api/get/power-netowrks: {e}", file=sys.stderr)
+        print(f"GET /api/get/power-networks: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
         return jsonify(data)
     finally:
@@ -348,6 +348,84 @@ def handleApiGetTierNamesRequest():
         return jsonify(get.getTierNames(db))
     except Exception as e:
         print(f"GET /api/get/tier-names: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+##### POWER SOURCE #####
+@app.route('/api/add/power-source', methods=['POST']) # add power source
+def handleApiAddPowerSourceRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        add.addPS(db, data)
+        return jsonify({'status':True})
+    except Exception as e:
+        print(f"POST /api/add/power-source: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/get/power-sources', methods=['GET']) # get all power sources
+def handleApiGetPowerSourcesRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getPSs(db))
+    except Exception as e:
+        print(f"GET /api/get/power-sources: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/get/power-source', methods=['POST']) # get power source
+def handleApiGetPowerSourceRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getPS(db,data))
+    except Exception as e:
+        print(f"GET /api/get/power-source: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/update/power-source', methods=['POST']) # update power source
+def handleApiUpdatePowerSourceRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(upd.updPS(db, data))
+    except Exception as e:
+        print(f"POST /api/update/power-source: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/delete/power-source', methods=['POST']) # delete PS
+def handleApiDeletePowerSourceRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(dele.delPS(db, data))
+    except Exception as e:
+        print(f"POST /api/delete/power-source: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
         return jsonify(data)
     finally:
