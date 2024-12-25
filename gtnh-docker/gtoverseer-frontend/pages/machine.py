@@ -59,6 +59,12 @@ if selected_filters != ss["selected_filters"]: # update only on change
 
 # List of machines container
 if ss["selected_filters"]:
+    # headers
+    cols = st.columns(len(ss["selected_filters"]))
+    for col, filter_name in zip(cols, ss["selected_filters"]):
+        col.write(filter_name)
+    
+    # rows
     for _ , row in df.iterrows(): # iterate throught entries
         cols = st.columns(len(ss["selected_filters"])) # creates columns based on the number of filters
         for col, filter_name in zip(cols, ss["selected_filters"]): # zip maps values to eachother 
