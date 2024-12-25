@@ -203,6 +203,82 @@ def handleApiGetPowerNetworkNamesRequest():
     finally:
         del db
 
+##### CABLE #####
+@app.route('/api/add/cable', methods=['POST']) # add cable
+def handleApiAddCableRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        add.addCable(db, data['name'], data['density'], data['tier_name'], data['max_amp'], data['loss'])
+        return jsonify({'status':True})
+    except Exception as e:
+        print(f"POST /api/add/cable: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/get/cables', methods=['GET']) # get all cables
+def handleApiGetCablesRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getCables(db))
+    except Exception as e:
+        print(f"GET /api/get/cables: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/update/cable', methods=['POST']) # update cable
+def handleApiUpdateCableRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(upd.updCable(db, data))
+    except Exception as e:
+        print(f"POST /api/update/cable: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+@app.route('/api/delete/cable', methods=['POST']) # delete cable
+def handleApiDeleteCableRequest():
+    data = request.data
+    if isinstance(data, bytes):
+        data = str(data.decode('utf-8'))
+        data = json.loads(data)
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(dele.delCable(db, data["name"]))
+    except Exception as e:
+        print(f"POST /api/delete/cable: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
+
+##### TIER #####
+@app.route('/api/get/tier-names', methods=['GET']) # get all Tier names
+def handleApiGetTierNamesRequest():
+    try:
+        db = Database(conn_params) # open db connection
+        return jsonify(get.getTierNames(db))
+    except Exception as e:
+        print(f"GET /api/get/tier-names: {e}", file=sys.stderr)
+        data = {'status':False, 'error': str(e)}
+        return jsonify(data)
+    finally:
+        del db
+
 
 if __name__ == '__main__':
     conn_params = {

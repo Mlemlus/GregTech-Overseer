@@ -87,7 +87,7 @@ with st.container(height=300):
             st.rerun()
         # Edit row logic 
         if ss["update_user_clicked_old_username"] == row["username"]:
-                with st.form("update_form", border=False):
+                with st.form("update_form", border=False, enter_to_submit=False):
                     submit_username = st.text_input(
                         "Username",  
                         max_chars=16,

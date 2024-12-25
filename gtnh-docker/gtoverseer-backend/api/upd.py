@@ -20,3 +20,8 @@ def updMachine(db, ID, name, pnname, chunkloaded, note):
         })
     return {'status':True}
 
+##### CABLE #####
+def updCable(db, data):
+    q.updateCable(db, data)
+    return {'status':True}
+

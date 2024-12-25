@@ -85,19 +85,28 @@ def insUser(db, kwargs):
             "password_hash" = EXCLUDED."password_hash"
         """, kwargs)
 
+# Cable
+def insCable(db, kwargs):
+    return db.insert("""
+        INSERT INTO gtoverseer.cable ("name", "density", "tier_ID", "max_amp", "loss")
+        VALUES (
+            %(name)s,
+            %(density)s,
+            (
+                SELECT "ID"
+                FROM gtoverseer.tier
+                WHERE "name" = %(tier_name)s
+            ),
+            %(max_amp)s,
+            %(loss)s
+        )
+        ON CONFLICT ("name") DO NOTHING
+        """, kwargs)
 
 ################## READ ##################
-def selTiers(db):
-    return db.select('SELECT "ID", "name", "eu" FROM gtoverseer.tier')
-
+# OC Computer
 def selComputer(db, oc_address):
     return db.selectSingle('SELECT "ID" FROM gtoverseer.oc_computer WHERE oc_address = %s', oc_address)
-
-def selMachine(db, oc_address):
-    return db.selectSingle('SELECT "ID" FROM gtoverseer.machine WHERE oc_address = %s', oc_address)
-
-def selTier(db, voltage):
-    return db.selectSingle('SELECT ("ID") FROM gtoverseer.tier WHERE eu = %s', voltage)
 
 # User
 def selUserUsername(db, username):
@@ -129,6 +138,9 @@ def searchUsers(db, kwargs):
         """, kwargs)
 
 # Machine
+def selMachine(db, oc_address):
+    return db.selectSingle('SELECT "ID" FROM gtoverseer.machine WHERE oc_address = %s', oc_address)
+
 def machineReport(db):
     return db.select(
         """
@@ -142,6 +154,30 @@ def selAllNetowrksNames(db):
         """
         SELECT "name"
         FROM gtoverseer.power_network
+        """)
+
+# Cable
+def selAllCables(db):
+    return db.select(
+        """
+        SELECT c."name", t."name", c."density", c."max_amp", c."loss"
+        FROM gtoverseer.cable c
+        LEFT JOIN gtoverseer.tier t ON c."tier_ID" = t."ID"
+        ORDER BY c."name"
+        """)
+
+# Tier
+def selTier(db, voltage):
+    return db.selectSingle('SELECT ("ID") FROM gtoverseer.tier WHERE eu = %s', voltage)
+
+def selTiers(db):
+    return db.select('SELECT "ID", "name", "eu" FROM gtoverseer.tier')
+
+def selAllTierNames(db):
+    return db.select(
+        """
+        SELECT "name"
+        FROM gtoverseer.tier
         """)
 
 ################## UPDATE ##################
@@ -201,6 +237,24 @@ def updateMachine(db, kwargs):
         WHERE "machine_ID" = %(ID)s
         """, kwargs)
 
+# Cable
+def updateCable(db, kwargs):
+    return db.update(
+        """
+        UPDATE gtoverseer.cable
+        SET
+            "name" = %(name)s,
+            "density" = %(density)s,
+            "tier_ID" = (
+                SELECT "ID"
+                FROM gtoverseer.tier
+                WHERE "name" = %(tier_name)s
+            ),
+            "max_amp" = %(max_amp)s,
+            "loss" = %(loss)s
+        WHERE "name" = %(old_name)s
+        """, kwargs)
+
 ################## DELETE ##################
 def deleteUser(db, kwargs):
     return db.delete(
@@ -208,3 +262,10 @@ def deleteUser(db, kwargs):
         DELETE FROM gtoverseer.user
         WHERE "username" = %(username)s
         """, kwargs)
+
+def deleteCable(db, kwargs):
+    return db.delete(
+    """
+    DELETE FROM gtoverseer.cable
+    WHERE "name" = %(name)s
+    """, kwargs)

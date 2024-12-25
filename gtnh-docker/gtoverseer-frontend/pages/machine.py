@@ -80,7 +80,7 @@ if ss["selected_filters"]:
                 power_networks = [None]
 
             # update form
-            with st.form("update_form", border=False):
+            with st.form("update_form", border=False, enter_to_submit=False):
                 submit_name = st.text_input(
                     "Custom Machine Name",
                     max_chars=100,

@@ -48,3 +48,19 @@ def getPowerNetworkNames(db):
         return {'status':True, 'pnnames':power_networks}
     else:
         return {'status':False, 'pnnames':{"upsieWoopsie"}}
+
+##### CABLE #####
+def getCables(db):
+    cables = q.selAllCables(db)
+    if cables:
+        return {'status':True, 'cables':cables}
+    else:
+        return {'status':False, 'cables':{"upsieWoopsie"}}
+
+##### TIER #####
+def getTierNames(db):
+    tiers = q.selAllTierNames(db)
+    if tiers:
+        return {'status':True, 'tiers':tiers}
+    else:
+        return {'status':False, 'tiers':{"upsieWoopsie"}}
