@@ -80,7 +80,7 @@ if ss["selected_filters"]:
             # get power networks list
             response = requests.get("http://10.21.31.5:40649/api/get/power-network-names")
             if response.json()["status"]:
-                power_networks = response.json()["pnnames"]
+                power_networks = [i[0] for i in response.json()["pnnames"]]
                 power_networks.insert(0, None) # insert Null option
             else:
                 power_networks = [None]

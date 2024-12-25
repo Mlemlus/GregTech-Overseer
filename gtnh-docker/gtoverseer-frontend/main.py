@@ -5,7 +5,7 @@ from PIL import Image
 from io import BytesIO
 
 ## Page config ##
-st.set_page_config(page_title="GregTech Overseer")
+st.set_page_config(page_title="GregTech Overseer", layout="wide")
 
 #### Session state inicializations ####
 if "show_logout_confirm" not in ss: # init logout process tracking
