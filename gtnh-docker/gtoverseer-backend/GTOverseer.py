@@ -15,7 +15,7 @@ shared.oc_stations = {
         "last_reset":datetime.datetime.now(),
         "latest_config":False}
     }
-shared.oc_stations_update_rate = 5 # seconds
+shared.oc_stations_update_rate = 3 # seconds
 shared.oc_stations_reinitialization_rate = 5 # minutes
 
 @app.before_request

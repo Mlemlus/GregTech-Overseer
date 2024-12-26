@@ -51,7 +51,7 @@ def handleDataRequest():
         print(f"handleDataRequest: {e}", file=sys.stderr)
         return "500" + f"handleDataRequest: {e}"
     # if one of the status tasks failed, the next task gets overriden
-    if override_task:
+    if override_task != None:
         return override_task
 
     # check if we got the station registered
