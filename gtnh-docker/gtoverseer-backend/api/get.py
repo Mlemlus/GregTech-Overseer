@@ -1,4 +1,4 @@
-import data.database.query as q
+import data.database.query as q, shared as s
 
 ##### USER #####
 def loginProcess(db, data):
@@ -55,3 +55,11 @@ def getPSs(db):
 def getPS(db, kwargs):
     status, ps = q.selPowerSource(db, kwargs)
     return {"status":status, "ps":ps}
+
+##### SERVER CONFIG #####
+def getServerConfig():
+    return {
+        "status":True,
+        "oc_stations_update_rate":(s.oc_stations_update_rate*1000),
+        "oc_stations_reinitialization_rate":s.oc_stations_reinitialization_rate
+    }

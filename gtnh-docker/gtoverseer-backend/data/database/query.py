@@ -51,11 +51,13 @@ def insWork(db, kwargs):
 
 # OC Station
 def insComputer(db, kwargs):
-    # insert computah, if exist do nothing
-    if (oc_comp_id := selComputer(db, kwargs["computer_oc_address"])):
-        return oc_comp_id
-    else:
-        return db.insert('INSERT INTO gtoverseer.oc_computer (oc_address) VALUES (%(computer_oc_address)s) RETURNING "ID"', kwargs)
+    return db.insert("""
+        INSERT INTO gtoverseer.oc_computer ("oc_address")
+        VALUES (
+            %(computer_oc_address)s
+        )
+        ON CONFLICT ("oc_address") DO NOTHING
+        """, kwargs)
 
 # User
 def insUser(db, kwargs):
@@ -149,8 +151,12 @@ def insPowerSource(db, kwargs):
 
 ################## SELECT ##################
 # OC Station
-def selComputer(db, oc_address):
-    return db.selectSingle('SELECT "ID" FROM gtoverseer.oc_computer WHERE oc_address = %s', oc_address)
+def selComputer(db, kwargs):
+    return db.selectMultiple("""
+        SELECT "ID" 
+        FROM gtoverseer.oc_computer
+        WHERE "oc_address" = %(computer_oc_address)s
+        """, kwargs)
 
 # User
 def selUserUsername(db, username):
@@ -175,7 +181,11 @@ def selAllUsers(db):
 
 # Machine
 def selMachine(db, kwargs):
-    return db.selectMultiple('SELECT "ID" FROM gtoverseer.machine WHERE oc_address = %(oc_address)s', kwargs)
+    return db.selectMultiple("""
+        SELECT "ID" 
+        FROM gtoverseer.machine 
+        WHERE oc_address = %(oc_address)s
+        """, kwargs)
 
 def machineReport(db):
     return db.select(

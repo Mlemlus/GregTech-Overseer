@@ -1,4 +1,4 @@
-import data.database.query as q
+import data.database.query as q, shared as s
 
 ##### USER #####
 def updUser(db, data):
@@ -26,3 +26,11 @@ def updPN(db, data):
 def updPS(db, data):
     status, err = q.updatePowerSource(db, data)
     return {"status":status, "error":err}
+
+##### SERVER CONFIG #####
+def updServerConfig(data):
+    s.oc_stations_update_rate = data["oc_stations_update_rate"]/1000
+    s.oc_stations_reinitialization_rate = data["oc_stations_reinitialization_rate"]
+    for station in s.oc_stations:
+        station["latest_config"] = False
+    return {"status":True}

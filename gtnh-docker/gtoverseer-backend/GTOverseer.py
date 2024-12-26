@@ -1,11 +1,17 @@
 from flask import Flask, g
 from routes.api import api_bp, initAddAdmin
 from routes.data import data_bp
-import os, time, sys
+import os, time, datetime, sys, shared
 
+# init Flask
 app = Flask(__name__)
 app.register_blueprint(api_bp)
 app.register_blueprint(data_bp)
+
+# init shared vals
+shared.oc_stations = {}
+shared.oc_stations_update_rate = 3 # seconds
+shared.oc_stations_reinitialization_rate = 5 # minutes
 
 @app.before_request
 def before_request(): # executes before every request

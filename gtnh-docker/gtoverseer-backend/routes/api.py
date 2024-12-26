@@ -20,6 +20,27 @@ def initAddAdmin(conn_params, admin_params):
     finally:
         del db
 
+####### NOT CRUD ####### - very creative
+##### SERVER CONFIG #####
+@api_bp.route('/api/get/server-config', methods=['GET']) # server config get
+def apiGetServerConfig():
+    try:
+        return jsonify(get.getServerConfig())
+    except Exception as e:
+        print(f"GET /api/get/server-config: {e}", file=sys.stderr)
+        return jsonify({'status':False, 'error': str(e)})
+
+@api_bp.route('/api/update/server-config', methods=['POST']) # update user
+def apiUpdateServerConfig():
+    try:
+        data = request.json
+        return jsonify(upd.updServerConfig(data))
+    except Exception as e:
+        print(f"POST /api/update/server-config: {e}", file=sys.stderr)
+        return jsonify({'status':False, 'error': str(e)})
+
+
+####### CRUD #######
 ##### USER #####
 @api_bp.route('/api/authenticate', methods=['POST']) # user login auth process
 def apiAuth():
