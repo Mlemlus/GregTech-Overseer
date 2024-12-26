@@ -5,8 +5,7 @@ WORKDIR /usr/src/app
 RUN apt update && apt upgrade -y
 RUN pip install --no-cache-dir altair pandas streamlit
 
-COPY main.py ./main.py
-COPY pages ./pages
+COPY . .
 
 HEALTHCHECK CMD curl --fail http://localhost/_stcore/health
 

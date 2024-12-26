@@ -9,12 +9,7 @@ app.register_blueprint(api_bp)
 app.register_blueprint(data_bp)
 
 # init shared vals
-shared.oc_stations = {
-    "oc_address":{
-        "last_response":datetime.datetime.now(),
-        "last_reset":datetime.datetime.now(),
-        "latest_config":False}
-    }
+shared.oc_stations = {}
 shared.oc_stations_update_rate = 3 # seconds
 shared.oc_stations_reinitialization_rate = 5 # minutes
 
