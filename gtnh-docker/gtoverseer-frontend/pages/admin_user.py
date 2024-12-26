@@ -4,10 +4,10 @@ import requests
 import pandas as pd
 
 #### Session state inicializations ####
-if "add_user_condition" not in ss:
+if "add_user_condition" not in ss: # Condition checks for input requirements
     ss.add_user_condition = [False,False,False]
 
-if "update_user_clicked_old_username" not in ss: # for each users holds the state of update process
+if "update_user_clicked_old_username" not in ss: # holds the selected username of update process
     ss.update_user_clicked_old_username = ""
 
 if "delete_user_clicked_username" not in ss:
@@ -18,13 +18,18 @@ if "delete_user_clicked_username" not in ss:
 def addUser(username, email, password):
     try:
         # post new user info to API
-        response = requests.post("http://10.21.31.5:40649/api/add/user", json={"username":username, "email": email, "password": password})
+        response = requests.post(
+            "http://10.21.31.5:40649/api/add/user", 
+            json={
+                "username":username,
+                "email": email,
+                "password": password
+                })
         data = response.json()
         if data['status']: # status is a boolean
             ss.backlog_message = "User added"
         else:
-            ss.backlog_message ="Failed to add user"
-
+            ss.backlog_message = f"Failed to add user:{data["error"]}"
     except Exception as e:
         ss.backlog_message = f"AddUser error: {e}"
 
@@ -39,13 +44,19 @@ def updateUser():
         ss.backlog_message = "Email too short"
     else:
         # post update user info to API
-        response = requests.post("http://10.21.31.5:40649/api/update/user", json={"old_username":ss["update_user_clicked_old_username"], "username":ss["update_user_clicked_username"], "email":ss["update_user_clicked_email"]})
+        response = requests.post(
+            "http://10.21.31.5:40649/api/update/user", 
+            json={
+                "old_username":ss["update_user_clicked_old_username"], 
+                "username":ss["update_user_clicked_username"], 
+                "email":ss["update_user_clicked_email"]
+                })
         data = response.json()
         ss["update_user_clicked_old_username"] = "" # reset edit state
         if data['status']:
             ss.backlog_message = "User updated"
         else:
-            ss.backlog_message ="Failed to update user"
+            ss.backlog_message = f"Failed to update user: {data["error"]}"
 
 def deleteUser():
     # post delete user info to API
@@ -81,37 +92,38 @@ with st.container(height=300):
         col2.write(row["email"])
 
         # Edit button logic
-        if col3.button(label="Edit", key=f"edit_{row["username"]}"): # needs unique key
-            ss["update_user_clicked_old_username"] = row["username"] # sets the username to be edited in dataframe
-            ss["delete_user_clicked_username"] = "" # resets delete state
-            st.rerun()
-        # Edit row logic 
-        if ss["update_user_clicked_old_username"] == row["username"]:
-                with st.form("update_form", border=False, enter_to_submit=False):
-                    submit_username = st.text_input(
-                        "Username",  
-                        max_chars=16,
-                        value=row["username"],
-                        key="update_user_clicked_username" # holds value in session state beacuse buttons are stateless (smh)
-                    )
-                    submit_email = st.text_input(
-                        "Email", 
-                        max_chars=50,
-                        value=row["email"],
-                        key="update_user_clicked_email"
-                    )
-                    st.form_submit_button("Confirm changes", on_click=updateUser)
-
-        # Delete button logic
-        if col4.button(label="Delete", key=f"delete_{row["username"]}"): # needs unique key
-            ss["delete_user_clicked_username"] = row["username"] # sets the username to be delete in dataframe
-            ss["update_user_clicked_old_username"] = "" # Resets edit state
-            st.rerun()
-        # Delete row confirmation
-        if ss["delete_user_clicked_username"] == row["username"]:
-            if st.button(f"Confirm deletion of {row['username']}"):
-                deleteUser()
+        if row["username"] != ss.username:
+            if col3.button(label="Edit", key=f"edit_{row["username"]}"): # needs unique key
+                ss["update_user_clicked_old_username"] = row["username"] # sets the username to be edited in dataframe
+                ss["delete_user_clicked_username"] = "" # resets delete state
                 st.rerun()
+            # Edit row logic 
+            if ss["update_user_clicked_old_username"] == row["username"]:
+                    with st.form("update_form", border=False, enter_to_submit=False):
+                        submit_username = st.text_input(
+                            "Username",  
+                            max_chars=16,
+                            value=row["username"],
+                            key="update_user_clicked_username" # holds value in session state beacuse buttons are stateless (smh)
+                        )
+                        submit_email = st.text_input(
+                            "Email", 
+                            max_chars=50,
+                            value=row["email"],
+                            key="update_user_clicked_email"
+                        )
+                        st.form_submit_button("Confirm changes", on_click=updateUser)
+
+            # Delete button logic
+            if col4.button(label="Delete", key=f"delete_{row["username"]}"): # needs unique key
+                ss["delete_user_clicked_username"] = row["username"] # sets the username to be delete in dataframe
+                ss["update_user_clicked_old_username"] = "" # Resets edit state
+                st.rerun()
+            # Delete row confirmation
+            if ss["delete_user_clicked_username"] == row["username"]:
+                if st.button(f"Confirm deletion of {row['username']}"):
+                    deleteUser()
+                    st.rerun()
 
 
 

@@ -77,11 +77,13 @@ st.write("# Power Source Managment")
 ## select pss form ##
 st.write("### List of power sources")
 response = requests.get("http://10.21.31.5:40649/api/get/power-sources")
-if not response.json()["status"]:
-    st.error("No Power Sources :(")
-    df = pd.DataFrame([['']*7], columns=["Name","Tier","Output Amp", "Power Network", "Cur. Capacity", "Max Capacity", "machine_ID", "manual"])
-else:
+if response.json()["status"]:
     df = pd.DataFrame(response.json()["pss"], columns=["Name","Tier","Output Amp", "Power Network", "Cur. Capacity", "Max Capacity", "machine_ID", "manual"])
+else:
+    st.error(response.json()["pss"])
+    st.stop()
+if response.json()["pss"] == []:
+    st.error("No Power Sources :(")
 
 # List of pss container
 with st.container(height=500):

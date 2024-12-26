@@ -78,14 +78,16 @@ st.write("# Power Network Managment")
 ## select pns form ##
 st.write("### List of power networks")
 response = requests.get("http://10.21.31.5:40649/api/get/power-networks")
-if not response.json()["status"]:
-    st.error("No Power Networks :(")
-    df = pd.DataFrame([['']*4], columns=["Name","Cable","Created at", "Owner"])
-else:
+if response.json()["status"]:
     df = pd.DataFrame(response.json()["pns"], columns=["Name","Cable","Created at", "Owner"])
+else:
+    st.error(response.json()["pns"])
+    st.stop()
+if response.json()["pns"] == []:
+    st.error("No Power Networks :(")
 
 # List of pns container
-with st.container(height=300):
+with st.container(height=400):
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     col1.write("Name")
     col2.write("Cable")

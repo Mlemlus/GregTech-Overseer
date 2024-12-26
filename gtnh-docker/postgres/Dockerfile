@@ -1,27 +1,11 @@
 FROM postgres:17-bookworm
 
-# # set workdir
-# WORKDIR /docker-entrypoint-initdb.d
-
 # copy the scripts
 COPY *.sql /docker-entrypoint-initdb.d/
 COPY *.sh /docker-entrypoint-initdb.d/
 
 # pass them network restrictions
 COPY ./pg_hba.conf /etc/postgresql/pg_hba.conf
-
-# get that sweet db script in there
-# COPY ./postgre_GTOverseer.sql .
-
-# # get that gto_app password in here
-# ARG GTOVERSEER_POSTGRES_PASSWORD
-
-# # lets pass the env config into the script
-# COPY env_config.sh .
-# RUN chmod +x env_config.sh
-# RUN env_config.sh
-# RUN rm -f env_config.sh && rm -f postgre_GTOverseer.sql
-
 
 # # idk why this doesnt work
 # RUN chown -R postgres:postgres init.sql

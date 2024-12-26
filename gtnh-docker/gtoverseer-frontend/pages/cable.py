@@ -4,11 +4,11 @@ import requests
 import pandas as pd
 
 #### Session state inicializations ####
-if "update_cable_clicked_old_name" not in ss: # for each cable holds the state of update process
-    ss.update_cable_clicked_old_name = ""
+if "update_cable_old_name" not in ss: # holds the selected name of update process
+    ss.update_cable_old_name = ""
 
-if "delete_cable_clicked_name" not in ss:
-    ss.delete_cable_clicked_name = ""
+if "delete_cable_name" not in ss:
+    ss.delete_cable_name = ""
 
 
 #### Functions ####
@@ -29,32 +29,31 @@ def addCable():
             if data['status']: # returned status
                 ss.backlog_message = "Cable added"
             else:
-                ss.backlog_message ="Failed to add cable"
+                ss.backlog_message = f"Failed to add cable: {data["error"]}"
         else:
             ss.backlog_message="Cable name too short"
-
     except Exception as e:
         ss.backlog_message = f"addCable error: {e}"
 
 
 def updateCable():
     # min length checks
-    if len(ss["update_cable_clicked_name"]) <= 1:
+    if len(ss["update_cable_name"]) <= 1:
         ss.backlog_message = "Name too short"
     else:
         # post update cable info to API
         response = requests.post(
             "http://10.21.31.5:40649/api/update/cable",
             json={
-                "old_name":ss["update_cable_clicked_old_name"],
-                "name":ss["update_cable_clicked_name"],
-                "density":ss["update_cable_clicked_density"],
-                "tier_name":ss["update_cable_clicked_tier_name"],
-                "max_amp":ss["update_cable_clicked_max_amp"],
-                "loss":ss["update_cable_clicked_loss"]
+                "old_name":ss["update_cable_old_name"],
+                "name":ss["update_cable_name"],
+                "density":ss["update_cable_density"],
+                "tier_name":ss["update_cable_tier_name"],
+                "max_amp":ss["update_cable_max_amp"],
+                "loss":ss["update_cable_loss"]
                 })
         data = response.json()
-        ss["update_cable_clicked_old_name"] = "" # reset edit state
+        ss["update_cable_old_name"] = "" # reset edit state
         if data['status']:
             ss.backlog_message = "Cable updated"
         else:
@@ -62,13 +61,13 @@ def updateCable():
 
 def deleteCable():
     # post delete cable info to API
-    response = requests.post("http://10.21.31.5:40649/api/delete/cable", json={"name":ss["delete_cable_clicked_name"]})
+    response = requests.post("http://10.21.31.5:40649/api/delete/cable", json={"name":ss["delete_cable_name"]})
     data = response.json()
-    ss["delete_cable_clicked_name"] = "" # reset delete state
+    ss["delete_cable_name"] = "" # reset delete state
     if data['status']:
         ss.backlog_message = "Cable deleted"
     else:
-        ss.backlog_message ="Failed to delete cable"
+        ss.backlog_message = f"Failed to delete cable: {data["error"]}"
 
 
 #### Body ####
@@ -90,7 +89,7 @@ else:
     df = pd.DataFrame(response.json()["cables"], columns=["Name","Tier","Density", "Max Amp", "Loss"])
 
 # List of cables container
-with st.container(height=300):
+with st.container(height=400):
     col1, col2, col3, col4, col5, col6, col7 = st.columns([4, 1, 1.5, 1, 1.5, 2, 2])
     col1.write("Name")
     col2.write("Tier")
@@ -108,12 +107,12 @@ with st.container(height=300):
         if not row["Name"] == '': # display buttons if we got any cables
             # Edit button logic
             if col6.button(label="Edit", key=f"edit_{row["Name"]}"): # needs unique key
-                ss["update_cable_clicked_old_name"] = row["Name"] # sets the name to be edited in dataframe
-                ss["delete_cable_clicked_name"] = "" # resets delete state
+                ss["update_cable_old_name"] = row["Name"] # sets the name to be edited in dataframe
+                ss["delete_cable_name"] = "" # resets delete state
                 st.rerun()
 
             # Edit row logic
-            if ss["update_cable_clicked_old_name"] == row["Name"]:
+            if ss["update_cable_old_name"] == row["Name"]:
                 # get tiers list
                 response = requests.get("http://10.21.31.5:40649/api/get/tier-names")
                 if response.json()["status"]:
@@ -128,13 +127,13 @@ with st.container(height=300):
                         "Name",
                         max_chars=50,
                         value=row["Name"],
-                        key="update_cable_clicked_name"
+                        key="update_cable_name"
                     )
                     st.selectbox(
                         "Select Tier",
                         tiers,
                         index=tiers.index(row["Tier"]),
-                        key="update_cable_clicked_tier_name"
+                        key="update_cable_tier_name"
                     )
                     st.number_input(
                         "Density",
@@ -143,7 +142,7 @@ with st.container(height=300):
                         step=1,
                         format="%d",
                         value=row["Density"],
-                        key="update_cable_clicked_density"
+                        key="update_cable_density"
                     )
                     st.number_input(
                         "Max Amp",
@@ -152,7 +151,7 @@ with st.container(height=300):
                         step=1,
                         format="%d",
                         value=row["Max Amp"],
-                        key="update_cable_clicked_max_amp"
+                        key="update_cable_max_amp"
                     )
                     st.number_input(
                         "Power Loss",
@@ -161,18 +160,18 @@ with st.container(height=300):
                         step=1,
                         format="%d",
                         value=row["Loss"],
-                        key="update_cable_clicked_loss"
+                        key="update_cable_loss"
                     )
                     st.form_submit_button("Confirm changes", on_click=updateCable)
 
             # Delete button logic
             if col7.button(label="Delete", key=f"delete_{row["Name"]}"): # needs unique key
-                ss["delete_cable_clicked_name"] = row["Name"] # sets the name to be delete in dataframe
-                ss["update_cable_clicked_old_name"] = "" # Resets edit state
+                ss["delete_cable_name"] = row["Name"] # sets the name to be delete in dataframe
+                ss["update_cable_old_name"] = "" # Resets edit state
                 st.rerun()
-            
+
             # Delete row logic
-            if ss["delete_cable_clicked_name"] == row["Name"]:
+            if ss["delete_cable_name"] == row["Name"]:
                 if st.button(f"Confirm deletion of {row['Name']}"):
                     deleteCable()
                     st.rerun()

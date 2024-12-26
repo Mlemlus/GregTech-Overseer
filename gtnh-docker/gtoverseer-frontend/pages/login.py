@@ -6,14 +6,18 @@ import requests
 def login(email, password):
     try:
         # check with backend if login info is correct, if yes recieve username
-        response = requests.post("http://10.21.31.5:40649/api/authenticate", json={"email": str(email), "password": str(password)})
+        response = requests.post(
+            "http://10.21.31.5:40649/api/authenticate",
+            json={
+                "email": str(email),
+                "password": str(password)})
         data = response.json()
-        if data["status"]: # status is a boolean
-            ss.username = data["username"] # set session username
+        if data["status"] and data["username"] != None: # status is a boolean
+            ss.username = data["username"][0] # set session username
             ss.logged_in = True
             ss.backlog_message = "Login successful"
         else:
-            ss.backlog_message ="Username or password is not valid."
+            ss.backlog_message ="Email or password is not valid."
     except Exception as e:
         ss.backlog_message = f"Login error: {e}"
 

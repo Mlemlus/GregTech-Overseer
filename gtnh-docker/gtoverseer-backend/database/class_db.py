@@ -1,13 +1,13 @@
 import psycopg2, sys
 
-class db:
+class db: # Database class, opens the connection and executes cursor commands with its functions, on destruction closes database connection
     def __init__(self, connection_parameters):
-        self.conn = None
+        self.conn = None # Connection variable
         # Opening the database connection
         try:
-            self.conn = psycopg2.connect(**connection_parameters) # connect to postgres with parameters
+            self.conn = psycopg2.connect(**connection_parameters) # connect to postgres with parameters, ** unpacks dict
         except Exception as e:
-            print(f"failed to connect to the database: {e}", file=sys.stderr)
+            print(f"db: failed to connect to the database: {e}", file=sys.stderr)
 
     def __del__(self): # class destruction function
         if self.conn:
@@ -17,7 +17,7 @@ class db:
     def insert(self, query, values):
         cur = self.conn.cursor() # Opens a new cursor
         try:
-            cur.execute(query, values) # Executes the query with the values
+            cur.execute(query, values) 
             self.conn.commit()
             return True, None
         except Exception as e:
@@ -25,15 +25,15 @@ class db:
             return False, e
         finally:
             cur.close()
-    
+
     def select(self, query):
         cur = self.conn.cursor()
         try:
             cur.execute(query)
             vals = cur.fetchall()
-            return vals
+            return True, vals
         except Exception as e:
-            self.conn.rollback() # idk if necessary 
+            self.conn.rollback()
             return False, e
         finally:
             cur.close()
@@ -43,19 +43,19 @@ class db:
         try:
             cur.execute(query, (value,))
             val = cur.fetchone()
-            return val
+            return True, val
         except Exception as e:
-            self.conn.rollback() # idk if necessary 
+            self.conn.rollback()
             return False, e
         finally:
             cur.close()
-    
+
     def selectMultiple(self, query, value):
         cur = self.conn.cursor()
         try:
             cur.execute(query, value)
             val = cur.fetchone()
-            return val
+            return True, val
         except Exception as e:
             self.conn.rollback()
             return False, e
@@ -79,20 +79,21 @@ class db:
         try:
             cur.execute(query, values)
             self.conn.commit()
-            return True
+            return True, None
         except Exception as e:
             self.conn.rollback()
             return False, e
         finally:
             cur.close()
-    
+
     def delete(self, query, values):
         cur = self.conn.cursor()
         try:
             cur.execute(query, values)
             self.conn.commit()
-            return True 
+            return True, None
         except Exception as e:
+            self.conn.rollback()
             return False, e
         finally:
             cur.close()

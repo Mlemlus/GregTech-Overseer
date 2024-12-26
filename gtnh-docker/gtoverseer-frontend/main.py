@@ -22,10 +22,10 @@ if "username" not in ss: # init login status tracking
 def fetch_image(username): # get profile picture, uses mineatar.io and mojang public API
     try:
         response_uuid = requests.get(f'https://api.mojang.com/users/profiles/minecraft/{username}?')
-        response_uuid.raise_for_status() # throw error if problem
+        response_uuid.raise_for_status() # throws HTTPError if response is error
         uuid = response_uuid.json()['id']
         response_image = requests.get(f"https://api.mineatar.io/face/{uuid}")
-        response_image.raise_for_status()  
+        response_image.raise_for_status()
         return Image.open(BytesIO(response_image.content))
     except Exception:
         return False # probably should implement troll face instead
@@ -44,7 +44,6 @@ machine_page = st.Page("pages/machine.py", title="Machines", icon=":material/fac
 server_config = st.Page("pages/server_config.py", title="Server configuration", icon=":material/settings:")
 cable_page = st.Page("pages/cable.py", title="Cables", icon=":material/cable:")
 power_source_page = st.Page("pages/power_source.py", title="Power Source Machines", icon=":material/power:")
-
 
 ## Account ##
 user_config = st.Page("pages/user_config.py", title="Profile settings", icon=":material/settings:")

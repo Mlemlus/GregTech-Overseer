@@ -2,101 +2,57 @@ import database.query as q
 import sys ################
 
 ##### USER #####
-def loginProcess(db, email, password):
-    username = q.selUserEmailPassword(db, {"email": str(email), "password": str(password)})
-    # priviliges and stuff can be returned from here
-    #   *futureproofing*
-    if username:
-        return {'status':True, 'username':username[0]}
-    else:
-        return {'status':False, 'username':""}
+def loginProcess(db, data):
+    status, username = q.selUserEmailPassword(db, data)
+    return {"status":status, "username":username}
 
 def getUsers(db):
-    users = q.selAllUsers(db)   
-    if users:
-        return {'status':True, 'users':users}
-    else:
-        return {'status':False, 'users':{"upsieWoopsie"}}
+    status, users = q.selAllUsers(db)
+    return {"status":status, "users":users}
+
     
 def getUser(db, username):
-    user = q.selUserUsername(db, username)
-    if user:
-        return {'status':True, 'user':user}
-    else:
-        return {'status':False, 'user':{}}
+    status, user = q.selUserUsername(db, username)
+    return {"status":status, "user":user}
 
-def searchUsers(db, search_term):
-    users = q.searchUsers(db, {"search": str(search_term)})
-    if users:
-        return {'status':True, 'users':users}
-    else:
-        return {'status':False, 'users':{}}
-    
 ##### MACHINE #####
 def getMachines(db):
-    machines = q.machineReport(db)
-    if machines:
-        return {'status':True, 'machines':machines}
-    else:
-        return {'status':False, 'machines':{"upsieWoopsie"}}
+    status, machines = q.machineReport(db)
+    return {"status":status, "machines":machines}
 
 def searchMachines(db, kwargs):
     kwargs["wild_search"] = "%" + kwargs["search"] + "%" # prep the search
     status, machines = q.selSearchMachines(db, kwargs)
-    if status:
-        return {'status':True, 'machines':machines}
-    else:
-        return {'status':False, 'error':machines, 'machines':{"upsieWoopsie"}}
+    return {"status":status, "machines":machines}
 
 ##### POWER NETWORK #####
 def getPowerNetworkNames(db):
-    power_networks = q.selAllNetowrksNames(db)
-    if power_networks:
-        return {'status':True, 'pnnames':power_networks}
-    else:
-        return {'status':False, 'pnnames':{"upsieWoopsie"}}
+    status, pnnames = q.selAllNetowrksNames(db)
+    return {"status":status, "pnnames":pnnames}
 
 def getPNs(db):
-    pns = q.selAllPowerNetworks(db)
-    if pns:
-        return {'status':True, 'pns':pns}
-    else:
-        return {'status':False, 'pns':{"upsieWoopsie"}}
+    status, pns = q.selAllPowerNetworks(db)
+    return {"status":status, "pns":pns}
 
 ##### CABLE #####
 def getCables(db):
-    cables = q.selAllCables(db)
-    if cables:
-        return {'status':True, 'cables':cables}
-    else:
-        return {'status':False, 'cables':{"upsieWoopsie"}}
+    status, cables = q.selAllCables(db)
+    return {"status":status, "cables":cables}
 
 def getCableNames(db):
-    cables = q.selAllCablesNames(db)
-    if cables:
-        return {'status':True, 'cables':cables}
-    else:
-        return {'status':False, 'cables':{"upsieWoopsie"}}
+    status, cables = q.selAllCablesNames(db)
+    return {"status":status, "cables":cables}
 
 ##### TIER #####
 def getTierNames(db):
-    tiers = q.selAllTierNames(db)
-    if tiers:
-        return {'status':True, 'tiers':tiers}
-    else:
-        return {'status':False, 'tiers':{"upsieWoopsie"}}
+    status, tiers = q.selAllTierNames(db)
+    return {"status":status, "tiers":tiers}
 
 ##### POWER SOURCE #####
 def getPSs(db):
-    pss = q.selAllPowerSources(db)
-    if pss:
-        return {'status':True, 'pss':pss}
-    else:
-        return {'status':False, 'pss':{"upsieWoopsie"}}
+    status, pss = q.selAllPowerSources(db)
+    return {"status":status, "pss":pss}
 
 def getPS(db, kwargs):
-    ps = q.selPowerSource(db, kwargs)
-    if ps:
-        return {'status':True, 'ps':ps}
-    else:
-        return {'status':False, 'ps':{"upsieWoopsie"}}
+    status, ps = q.selPowerSource(db, kwargs)
+    return {"status":status, "ps":ps}

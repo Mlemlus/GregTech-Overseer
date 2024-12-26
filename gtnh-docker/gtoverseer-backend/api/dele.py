@@ -1,23 +1,21 @@
 import database.query as q
 
 ##### USER #####
-def delUser(db, username):
-    q.deleteUser(db, {"username": str(username)})
-    return {'status':True}
+def delUser(db, data):
+    status, err = q.deleteUser(db, data)
+    return {"status":status, "error":err}
 
 ##### CABLE #####
-def delCable(db, name):
-    q.deleteCable(db, {"name": str(name)})
-    return {'status':True}
+def delCable(db, data):
+    status, err = q.deleteCable(db, data)
+    return {"status":status, "error":err}
 
 ##### POWER NETWORK #####
 def delPN(db, data):
-    q.deletePowerNetwork(db, data)
-    return {'status':True}
+    status, err = q.deletePowerNetwork(db, data)
+    return {"status":status, "error":err}
 
 ##### POWER SOURCE #####
 def delPS(db, data):
-    q.deletePowerSource(db, data)
-    return {'status':True}
-
-
+    status, err = q.deletePowerSource(db, data)
+    return {"status":status, "error":err}

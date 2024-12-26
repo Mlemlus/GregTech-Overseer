@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from database.class_db import db as Database
-import json, uuid, os
+import json, uuid, os, time
 from data_process.data_parse import parseIntialData
 from data_process.data_processes import insRestart, updWork
 import api.add as add
@@ -62,7 +62,6 @@ def handlePostRequest():
     else:
         status, response = 400, "No recieved data"
 
-    
     # Send back a response
     return status + response
 
@@ -74,7 +73,7 @@ def handleApiAuthRequest():
     try:
         data = request.json
         db = Database(conn_params) # open db connection
-        response = get.loginProcess(db, data['email'], data['password'])
+        response = get.loginProcess(db, data)
         return jsonify(response) # returns dict with login info
     except Exception as e:
         print(f"POST /api/authenticate: {e}", file=sys.stderr)
@@ -91,8 +90,7 @@ def handleApiAddUserRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        add.addUser(db, data['username'], data['email'], data['password'])
-        return jsonify({'status':True})
+        return jsonify(add.addUser(db, data))
     except Exception as e:
         print(f"POST /api/add/user: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -136,7 +134,7 @@ def handleApiUpdateUserRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        return jsonify(upd.updUser(db, data['old_username'], data['username'], data['email']))
+        return jsonify(upd.updUser(db, data))
     except Exception as e:
         print(f"POST /api/update/user: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -152,7 +150,7 @@ def handleApiDeleteUserRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        return jsonify(dele.delUser(db, data['username']))
+        return jsonify(dele.delUser(db, data))
     except Exception as e:
         print(f"POST /api/delete/user: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -197,7 +195,7 @@ def handleApiUpdateMachineRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        return jsonify(upd.updMachine(db, data['ID'], data['name'], data['pnname'], data['chunkloaded'], data['note']))
+        return jsonify(upd.updMachine(db, data))
     except Exception as e:
         print(f"POST /api/update/machine: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -227,8 +225,7 @@ def handleApiAddPowerNetworkRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        add.addPN(db, data)
-        return jsonify({'status':True})
+        return jsonify(add.addPN(db, data))
     except Exception as e:
         print(f"POST /api/add/power-network: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -290,8 +287,7 @@ def handleApiAddCableRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        add.addCable(db, data['name'], data['density'], data['tier_name'], data['max_amp'], data['loss'])
-        return jsonify({'status':True})
+        return jsonify(add.addCable(db, data))
     except Exception as e:
         print(f"POST /api/add/cable: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -347,7 +343,7 @@ def handleApiDeleteCableRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        return jsonify(dele.delCable(db, data["name"]))
+        return jsonify(dele.delCable(db, data))
     except Exception as e:
         print(f"POST /api/delete/cable: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -378,8 +374,7 @@ def handleApiAddPowerSourceRequest():
         data = json.loads(data)
     try:
         db = Database(conn_params) # open db connection
-        add.addPS(db, data)
-        return jsonify({'status':True})
+        return jsonify(add.addPS(db, data))
     except Exception as e:
         print(f"POST /api/add/power-source: {e}", file=sys.stderr)
         data = {'status':False, 'error': str(e)}
@@ -458,12 +453,16 @@ if __name__ == '__main__':
     }
     
     # if we add the admin account every time, it has to exist (it gets updated on conflict)
-    try:
-        db = Database(conn_params) # open db connection
-        add.addUser(db, os.getenv("ADMIN_USERNAME"),os.getenv("ADMIN_EMAIL"),os.getenv("ADMIN_PASSWORD"))
-    except Exception as e:
-        print(f"main: no database connection: {e}", file=sys.stderr)
-    finally:
-        del db
+    admin_exist = False
+    while not admin_exist:
+        try:
+            db = Database(conn_params) # open db connection
+            add.addUser(db, {"username":os.getenv("ADMIN_USERNAME"),"email":os.getenv("ADMIN_EMAIL"),"password":os.getenv("ADMIN_PASSWORD")})
+            admin_exist = True
+        except Exception as e:
+            print(f"main admin add: no database connection: {e}", file=sys.stderr)
+            time.sleep(3) # wait for DB to initialize 
+        finally:
+            del db
 
     app.run(debug=True, host='0.0.0.0', port=40649)

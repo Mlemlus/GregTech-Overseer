@@ -45,19 +45,25 @@ st.write("# Machines")
 ## select machines form ##
 st.write("### List of machines")
 search = st.text_input("Search", max_chars=100)
-if search:
+if search: # get only searched machines
     response = requests.post("http://10.21.31.5:40649/api/search/machines", json={'search':search})
-    if not response.json()["status"]:
-        st.write(response.json()["error"])
-        st.error("No machines, are your OC stations set up correctly?")
+    if response.json()["status"]:
+        df = pd.DataFrame(response.json()["machines"], columns=["ID", "Name", "Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"])
+        if response.json()["machines"] == []:
+            st.markdown("No matches, try searching for machines `Name` or `Tier` or `Power Network`")
+    else:
+        st.error(response.json()["machines"])
         st.stop()
-    df = pd.DataFrame(response.json()["machines"], columns=["ID", "Name", "Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"])
-else:
+else: # get all machines
     response = requests.get("http://10.21.31.5:40649/api/get/machines")
-    if not response.json()["status"]:
-        st.error("No machines, are your OC stations set up correctly?")
+    if response.json()["status"]:
+        df = pd.DataFrame(response.json()["machines"], columns=["ID", "Name", "Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"])
+        if response.json()["machines"] == []:
+            st.error("No machines, are your GT machines connected and OC stations set up correctly?")
+    else:
+        st.error(response.json()["machines"])
         st.stop()
-    df = pd.DataFrame(response.json()["machines"], columns=["ID", "Name", "Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"])
+
 
 # Filters
 filters = ["ID", "Name","Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"] 

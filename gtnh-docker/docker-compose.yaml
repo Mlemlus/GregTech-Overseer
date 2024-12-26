@@ -1,6 +1,6 @@
 name: gtnh
 services:
-  tailscale:
+  tailscale: # VPN service for connections
     image: tailscale/tailscale:latest
     container_name: gtnh_tailscale
     # Hostname for the "machine" which is the container running. appears as the name of the machine in Tailscale
@@ -24,18 +24,16 @@ services:
       frontend:
         ipv4_address: ${TS_IP}
 
-  gtnh-server:
-    # docker build from the dockerfile in gtnh-server
+  gtnh-server: # GTNH minecraft server
     build:
       context: ./gtnh-server
       dockerfile: Dockerfile
     container_name: gtnh_server
-    # Tailscale needs to be running so the server starts (it's not accesible otherwise)
     depends_on:
-      tailscale:
+      tailscale: # Tailscale needs to be running so the server starts (it's not accesible otherwise)
         condition: service_started
     volumes:
-      - ${GTNHS_BACKUPS_DIR}:/minecraft/backups
+      - ${GTNHS_BACKUPS_DIR}:/minecraft/backups # serverutilities backups
     restart: ${RESTART_POLICY}
     networks:
       frontend:
@@ -43,7 +41,7 @@ services:
       backend:
           ipv4_address: 10.21.31.3
 
-  gtoverseer-frontend:
+  gtoverseer-frontend: # Streamlit web interface
     build:
       context: ./gtoverseer-frontend
       dockerfile: Dockerfile
@@ -60,7 +58,7 @@ services:
       frontend:
         ipv4_address: ${GTO_FRONTEND_IP}
 
-  gtoverseer-backend:
+  gtoverseer-backend: # Python REST API
     build:
       context: ./gtoverseer-backend
       dockerfile: Dockerfile
@@ -84,7 +82,7 @@ services:
       services:
         ipv4_address: 10.22.32.5
 
-  gtoverseer-db:
+  gtoverseer-db: # Postgres database
     build:
       context: ./postgres
       dockerfile: Dockerfile
@@ -138,28 +136,10 @@ services:
       services:
         ipv4_address: 10.22.32.4
 
-  tmp-pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: GTOverseer_pgadmin4
-    restart: ${RESTART_POLICY}
-    environment:
-      PGADMIN_DEFAULT_EMAIL: babicovydobroty@brambory.cz
-      PGADMIN_DEFAULT_PASSWORD: 1kilosoli
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    volumes:
-      - tmp_pgadmin:/var/lib/pgadmin
-    ports:
-      - "127.0.0.1:5050:80"
-    networks:
-      frontend:
-        ipv4_address: 10.20.30.10
-      services:
-        ipv4_address: 10.22.32.10
-
 
 volumes:
   db_gtoverseer:
-    name: postgres-db-gtoverseer
+    name: gtoverseer-db
   tmp_pgadmin:
 
 networks:
@@ -170,7 +150,7 @@ networks:
       config:
         - subnet: ${TS_ROUTE}
 
-  # For communication between the server and GTOverseer
+  # For communication between the server, frontend and backend
   backend:
     driver: bridge
     ipam:
@@ -178,16 +158,10 @@ networks:
         - subnet: 10.21.31.0/24
     internal: true
 
-  # Internal communication between the database and GTOverseer
+  # Internal communication between the database and backend
   services:
     driver: bridge
     ipam:
       config:
         - subnet: 10.22.32.0/24
     internal: true
-
-
-
-# Q: Why isn't services same as the backend network?
-  # A: FALSE SENSE OF SECURITY GODDAMIT!
-  # Also you could probably get into the databse through the OC stations in gtnh-server

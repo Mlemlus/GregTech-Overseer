@@ -1,5 +1,5 @@
-import re, sys 
-def parseIntialData(data):
+import re, sys
+def parseIntialData(data): # Processes the recieved OC data to structured data
     tbl = {}
 
     # OC station
@@ -12,7 +12,6 @@ def parseIntialData(data):
         return False, "Wrong data format: " + str(e)
 
     # Machines
-    count_mistakes = 0
     for i in range(2,len(data)+1):
         try:
             val = {}
@@ -45,17 +44,14 @@ def parseIntialData(data):
                     val = val | parseSensorInfo(data[str(i)]["machine"]["sensor_info"]) # | merges two dictionaries
 
             # just some cleanup
-            if val["input_eu"] == 0: # non-working machine/generator
-                count_mistakes += 1
-                raise ValueError('input_eu of machine is 0, skipping')
+            if val["input_eu"] == 0: # machine/generator without input, cant determine tier
+                val["input_eu"] = 8 # so we just set it to LV and cry about it
             else:
                 val["input_eu"], amp = nearestTier(val["input_eu"]) 
                 val["amp"] = amp 
-            tbl[i - count_mistakes] = val # add the machine to the table
-
+            tbl[i] = val # add the machine to the table
         except Exception as e:
-            print(f"parseIntialData:{data[str(i)]["machine"]["name"]}: {e}",file=sys.stderr)
-
+            print(f"data_parse.parseIntialData:{data[str(i)]["machine"]["name"]}: {e}",file=sys.stderr)
     return tbl
 
 def nearestTier(val): # returns tier eu of the val
@@ -70,36 +66,36 @@ def nearestTier(val): # returns tier eu of the val
             else:
                 nearest = nearest * 4
     except Exception as e:
-        print(f"data_parse: Failed to find the nearest tier for {val}, err: {e}", file=sys.stderr)
+        print(f"data_parse.nearestTier: Failed to find the nearest tier for {val}, err: {e}", file=sys.stderr)
         return 0,0
     return int(nearest), int(multiplier)
 
 # i am scared to read below this comment
-def parseSensorInfo(sensor_info):
+# Update: I am still scared
+def parseSensorInfo(sensor_info): # Extracts what it can from sensor data (the info when you hover over a machine controller)
     parsed_data = {} # output
-
     # first get rid of the formatting characters
-    unformatted_sensor_info = []
-    for _, v in sensor_info.items():
-        if "§" in v:
-            formatting_chars = {"§a","§c","§e","§l","§n","§r","§1","§2","§3","§4","§5","§9", ","} # "," for integers
-            pattern = '|'.join(re.escape(char) for char in formatting_chars)
-            v = re.sub(pattern,'',v)
-            v = v.replace('§','') # for anything left
-        unformatted_sensor_info.append(v)
-    
+    # These are just color modifiers etc.
+    unformatted_sensor_info = [] # "Clean" sensor data
+    for _, row in sensor_info.items():
+        if "§" in row:
+            formatting_chars = {"§a","§c","§e","§l","§n","§r","§1","§2","§3","§4","§5","§9", ","} # Table of chars for regex pattern, "," for integers
+            pattern = '|'.join(re.escape(char) for char in formatting_chars) # Creation of the regex pattern (just combines the formatting_chars with |)
+            row = re.sub(pattern,'',row) # Replaces the formatting_chars in sensor row with empty space
+            row = row.replace('§','') # for anything left that didnt have a number
+        unformatted_sensor_info.append(row)
+
     # secondly, split the strings into keys and values
-    tmp_key = None
-    for v in unformatted_sensor_info:     
+    tmp_key = None # Holds the name of the variable when its on two rows, GT++ have Stored Energy:\n  int/int
+    for row in unformatted_sensor_info:
         try:
             if tmp_key: # get value for previous line key
-                parsed_data = parsed_data | extractValue(tmp_key, v)
+                parsed_data = parsed_data | extractValue(tmp_key, row) # Adds to output
                 tmp_key = None
                 continue
-
-            elif ":" in v:
+            elif ":" in row:
                 # Split at the first :
-                key, value = v.split(":", 1)
+                key, value = row.split(":", 1)
                 key = key.strip()  # remove whitespace around key
                 if key in parsed_data: # duplicate data, probably sci values
                     continue
@@ -107,18 +103,17 @@ def parseSensorInfo(sensor_info):
                     tmp_key = key
                     continue
                 else:
-                    parsed_data = parsed_data | extractValue(key, v)
-
+                    parsed_data = parsed_data | extractValue(key, row)
             else:
                 # when its just info (or a random string with usefull info)
-                if v == "No Maintenance issues": # Combustion Engine speciality
+                if row == "No Maintenance issues": # Combustion Engine speciality
                     parsed_data["Problems"] = 0
-                elif v == "Needs Maintenance":
+                elif row == "Needs Maintenance":
                     parsed_data["Problems"] = 1
                 else:
                     continue
         except Exception as e:
-            print(f"parseSensorInfo: Can't parse line {v} in sensor_info : {e}", file=sys.stderr)
+            print(f"data_parse.parseSensorInfo: Failed parse line {row} in sensor_info : {e}", file=sys.stderr)
             continue
 
     return parsed_data
@@ -126,15 +121,13 @@ def parseSensorInfo(sensor_info):
 def extractValue(key, val): # takes values, returns dictionary to merge
     # regex patterns
     int_pattern = re.compile(r"(\d+)")
-    float_pattern = re.compile(r"(\d+\.\d+)")\
-
+    float_pattern = re.compile(r"(\d+\.\d+)")
     output = {}
-    
+
     # val with multiple parts aka " / "
-    if " / " in val:  
+    if " / " in val:
         parts = val.split(" / ")
         output[key] = []
-
         for part in parts:
             # get the integer or float from each part
             if match := int_pattern.search(part): # I love warlus
@@ -143,7 +136,7 @@ def extractValue(key, val): # takes values, returns dictionary to merge
                 output[key].append(float(match.group()))
             else:
                 output[key].append(part.strip()) # get the string and strip the whitespaces
-    
+
     # line "Problems: int Efficiency: float %",
     elif "Problems" in key:
         problems_match = int_pattern.search(val)
@@ -167,5 +160,4 @@ def extractValue(key, val): # takes values, returns dictionary to merge
             output[key] = float(float_match.group())
         else:
             output[key] = str(val.strip())  # didn't match anything
-    
     return output
