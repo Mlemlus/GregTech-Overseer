@@ -1,5 +1,4 @@
-import database.query as q
-import sys ################
+import data.database.query as q
 
 ##### USER #####
 def loginProcess(db, data):

@@ -1,4 +1,4 @@
-import database.query as q
+import data.database.query as q
 import sys ##########
 
 def insRestart(db, data): # Handling of data for the OC reinitialization

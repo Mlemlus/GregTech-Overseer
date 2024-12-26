@@ -1,4 +1,4 @@
-import database.query as q
+import data.database.query as q
 
 ##### USER #####
 def updUser(db, data):
