@@ -41,12 +41,12 @@ dashboard = st.Page("pages/dashboard.py", title="Dashboard", icon=":material/das
 ## Utils ##
 pw_network_page = st.Page("pages/power_network.py", title="Power Networks", icon=":material/bolt:")
 machine_page = st.Page("pages/machine.py", title="Machines", icon=":material/factory:")
-server_config = st.Page("pages/server_config.py", title="Server configuration", icon=":material/settings:")
 cable_page = st.Page("pages/cable.py", title="Cables", icon=":material/cable:")
 power_source_page = st.Page("pages/power_source.py", title="Power Source Machines", icon=":material/power:")
 
-## Account ##
-user_config = st.Page("pages/user_config.py", title="Profile settings", icon=":material/settings:")
+## Configuration ##
+user_config = st.Page("pages/user_config.py", title="Profile settings", icon=":material/account_circle:")
+server_config = st.Page("pages/server_config.py", title="Server configuration", icon=":material/settings:")
 
 ## Admin only pages ##
 admin_manage_user = st.Page("pages/admin_user.py", title="Users managment", icon=":material/group:")
@@ -56,8 +56,8 @@ admin_manage_user = st.Page("pages/admin_user.py", title="Users managment", icon
 if ss.username != "":
     navigation = {
             "Reports": [dashboard],
-            "Utils": [machine_page,power_source_page , pw_network_page, cable_page, server_config],
-            "Account": [user_config]
+            "Utils": [machine_page,power_source_page , pw_network_page, cable_page],
+            "Configuration": [user_config, server_config]
             }
     if ss.username == os.getenv("ADMIN_USERNAME"):
         navigation["Administration"] = [admin_manage_user]
