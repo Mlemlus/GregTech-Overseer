@@ -24,7 +24,7 @@ def insCoord(db, kwargs):
     db.insert("""
         INSERT INTO gtoverseer.coord ("machine_ID", "x", "y", "z")
         VALUES
-            (%(machine_ID)s,
+            ((SELECT "ID" FROM gtoverseer.machine WHERE "oc_address" = %(oc_address)s),
             %(coords_x)s,
             %(coords_y)s,
             %(coords_z)s)
@@ -135,13 +135,13 @@ def insPowerSourceManual(db, kwargs):
 
 def insPowerSource(db, kwargs):
     db.insert("""
-        INSERT INTO gtoverseer.power_source ("machine_ID", "output_amp", "current_capacity", "max_capacity")
+        INSERT INTO gtoverseer.power_source ("machine_ID", "output_amp", "current_capacity", "max_capacity", "manual")
         VALUES
-            (%(machine_ID)s,
+            ((SELECT "ID" FROM gtoverseer.machine WHERE "oc_address" = %(oc_address)s),
             %(output_amp)s,
             %(eu_capacity_current)s,
-            %(eu_capacity)s)
-        WHERE "manual" = FALSE
+            %(eu_capacity)s,
+            FALSE)
         ON CONFLICT ("machine_ID") DO UPDATE
         SET
             "output_amp" = EXCLUDED."output_amp",
