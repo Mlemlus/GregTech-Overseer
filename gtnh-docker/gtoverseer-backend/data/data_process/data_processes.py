@@ -1,5 +1,5 @@
 import data.database.query as q
-import sys ##########
+import sys
 
 def insRestart(db, data): # Handling of data for the OC reinitialization
     # convert table tier to dictionary
@@ -21,7 +21,6 @@ def insRestart(db, data): # Handling of data for the OC reinitialization
         data[i]["oc_computer_ID"] = computer_oc_ID
         try:
             q.insMachine(db, data[i])
-            data[i]["machine_ID"] = q.selMachine(db, data[i])[0]
             q.insCoord(db, data[i])
         except Exception as e: # we keep this on the hush hush
             print(f"data_processes.insRestart: Failed to insert machine {data[i]["name"]}: {e}", file=sys.stderr)
