@@ -15,15 +15,16 @@ if "delete_user_clicked_username" not in ss:
 
 
 #### Functions ####
-def addUser(username, email, password):
+def addUser():
     try:
         # post new user info to API
         response = requests.post(
-            "http://10.21.31.5:40649/api/add/user", 
+            "http://10.21.31.5:40649/api/add/user",
             json={
-                "username":username,
-                "email": email,
-                "password": password
+                "username":ss.add_user_username,
+                "email": ss.add_user_email,
+                "password": ss.add_user_password,
+                "privileges":privilegeTable("add")
                 })
         data = response.json()
         if data['status']: # status is a boolean
@@ -49,7 +50,8 @@ def updateUser():
             json={
                 "old_username":ss["update_user_clicked_old_username"], 
                 "username":ss["update_user_clicked_username"], 
-                "email":ss["update_user_clicked_email"]
+                "email":ss["update_user_clicked_email"],
+                "privileges":privilegeTable("update")
                 })
         data = response.json()
         ss["update_user_clicked_old_username"] = "" # reset edit state
@@ -68,6 +70,27 @@ def deleteUser():
     else:
         ss.backlog_message ="Failed to delete user"
 
+def privilegeTable(operation:str): # returns a table of privileges based on the operation (add/edit)
+    output = []
+    operation = operation + "_"
+    # It is what it is (should have used st.pills)
+    # Also added privileges that cannot be selected so I dont have to write this in future
+    if ss[operation+"machine_add"]: output.append("Add Machines")
+    if ss[operation+"machine_edit"]: output.append("Edit Machines")
+    if ss[operation+"machine_remove"]: output.append("Remove Machines")
+    if ss[operation+"ps_add"]: output.append("Add Power Source Machines")
+    if ss[operation+"ps_edit"]: output.append("Edit Power Source Machines")
+    if ss[operation+"ps_remove"]: output.append("Remove Power Source Machines")
+    if ss[operation+"pn_add"]: output.append("Add Power Networks")
+    if ss[operation+"pn_edit"]: output.append("Edit Power Networks")
+    if ss[operation+"pn_remove"]: output.append("Remove Power Networks")
+    if ss[operation+"cable_add"]: output.append("Add Cables")
+    if ss[operation+"cable_edit"]: output.append("Edit Cables")
+    if ss[operation+"cable_remove"]: output.append("Remove Cables")
+    if ss[operation+"view_logs"]: output.append("View Logs")
+    if ss[operation+"manage_maintenance"]: output.append("Manage Maintenance")
+    if ss[operation+"administrator"]: output.append("Administrator")
+    return output
 
 
 #### Body ####
@@ -87,7 +110,10 @@ response = requests.get("http://10.21.31.5:40649/api/get/users")
 df = pd.DataFrame(response.json()["users"], columns=["username", "email"])
 
 # List of users container
-with st.container(height=300):
+with st.container(height=500):
+    col1, col2, col3, col4 = st.columns([2, 2, 1, 1])
+    col1.write("Username")
+    col2.write("Email")
     for _ , row in df.iterrows(): # iterate throught entries
         col1, col2, col3, col4 = st.columns([2, 2, 1, 1]) # columns for values and buttons
         col1.write(row["username"])
@@ -101,6 +127,9 @@ with st.container(height=300):
                 st.rerun()
             # Edit row logic 
             if ss["update_user_clicked_old_username"] == row["username"]:
+                    # get user privileges
+                    priv = requests.post("http://10.21.31.5:40649/api/get/user",json={"username":row["username"]}).json()["privileges"]
+                    # Update form
                     with st.form("update_form", border=False, enter_to_submit=False):
                         submit_username = st.text_input(
                             "Username",  
@@ -114,6 +143,29 @@ with st.container(height=300):
                             value=row["email"],
                             key="update_user_clicked_email"
                         )
+                        c1, c2, c3, c4, c5 = st.columns(5)
+                        # This would be much easier with multiselect or pills but it woudn't look as good
+                        c1.write("Machines")
+                        c1.checkbox("Add", key="update_machine_add", value=True if "Add Machines" in priv else False, disabled=True)
+                        c1.checkbox("Edit", key="update_machine_edit", value=True if "Edit Machines" in priv else False, disabled=False)
+                        c1.checkbox("Remove", key="update_machine_remove", value=True if "Remove Machines" in priv else False, disabled=False)
+                        c2.write("Power Source Machines")
+                        c2.checkbox("Add", key="update_ps_add", value=True if "Add Power Source Machines" in priv else False, disabled=True)
+                        c2.checkbox("Edit", key="update_ps_edit", value=True if "Edit Power Source Machines" in priv else False, disabled=False)
+                        c2.checkbox("Remove", key="update_ps_remove", value=True if "Remove Power Source Machines" in priv else False, disabled=True)
+                        c3.write("Power Networks")
+                        c3.checkbox("Add", key="update_pn_add", value=True if "Add Power Networks" in priv else False, disabled=False)
+                        c3.checkbox("Edit", key="update_pn_edit", value=True if "Edit Power Networks" in priv else False, disabled=False)
+                        c3.checkbox("Remove", key="update_pn_remove", value=True if "Remove Power Networks" in priv else False, disabled=False)
+                        c4.write("Cables")
+                        c4.checkbox("Add", key="update_cable_add", value=True if "Add Cables" in priv else False, disabled=False)
+                        c4.checkbox("Edit", key="update_cable_edit", value=True if "Edit Cables" in priv else False, disabled=False)
+                        c4.checkbox("Remove", key="update_cable_remove", value=True if "Remove Cables" in priv else False, disabled=False)
+                        c5.write("Other")
+                        c5.checkbox("View Logs", key="update_view_logs", value=True if "View Logs" in priv else False, disabled=False)
+                        c5.checkbox("Manage Maintenance", key="update_manage_maintenance", value=True if "Manage Maintenance" in priv else False, disabled=False)
+                        c5.checkbox("Administrator", key="update_administrator", value=True if "Administrator" in priv else False, disabled=False)
+                        # oh god what have I done
                         st.form_submit_button("Confirm changes", on_click=updateUser)
 
             # Delete button logic
@@ -155,7 +207,29 @@ st.text_input(
     on_change=formReq,
     args=("add_user_password","add_user",2,8)
 )
+c1, c2, c3, c4, c5 = st.columns(5)
+# This would be much easier with multiselect or pills but it woudn't look as good
+c1.write("Machines")
+c1.checkbox("Add", key="add_machine_add", value=False, disabled=True)
+c1.checkbox("Edit", key="add_machine_edit", value=False, disabled=False)
+c1.checkbox("Remove", key="add_machine_remove", value=False, disabled=False)
+c2.write("Power Source Machines")
+c2.checkbox("Add", key="add_ps_add", value=False, disabled=True)
+c2.checkbox("Edit", key="add_ps_edit", value=False, disabled=False)
+c2.checkbox("Remove", key="add_ps_remove", value=False, disabled=True)
+c3.write("Power Networks")
+c3.checkbox("Add", key="add_pn_add", value=False, disabled=False)
+c3.checkbox("Edit", key="add_pn_edit", value=False, disabled=False)
+c3.checkbox("Remove", key="add_pn_remove", value=False, disabled=False)
+c4.write("Cables")
+c4.checkbox("Add", key="add_cable_add", value=False, disabled=False)
+c4.checkbox("Edit", key="add_cable_edit", value=False, disabled=False)
+c4.checkbox("Remove", key="add_cable_remove", value=False, disabled=False)
+c5.write("Other")
+c5.checkbox("View Logs", key="add_view_logs", value=False, disabled=False)
+c5.checkbox("Manage Maintenance", key="add_manage_maintenance", value=False, disabled=False)
+c5.checkbox("Administrator", key="add_administrator", value=False, disabled=False)
 
 if st.button("Add", disabled=not all(ss.add_user_condition)):
-    addUser(ss.add_user_username, ss.add_user_email, ss.add_user_password)
+    addUser()
     st.rerun()

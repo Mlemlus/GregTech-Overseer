@@ -149,6 +149,15 @@ def insPowerSource(db, kwargs):
             "max_capacity" = EXCLUDED."max_capacity"
     """, kwargs)
 
+# User Privileges
+def insUserPrivilege(db, kwargs):
+    db.insert("""
+        INSERT INTO gtoverseer.user_privilege ("user_ID", "privilege_ID")
+        VALUES
+            ((SELECT "ID" FROM gtoverseer.user WHERE "username" = %(username)s),
+            (SELECT "ID" FROM gtoverseer.privilege WHERE "name" = %(privilege)s)
+        )
+    """, kwargs)
 ################## SELECT ##################
 # OC Station
 def selComputer(db, kwargs):
@@ -159,8 +168,21 @@ def selComputer(db, kwargs):
         """, kwargs)
 
 # User
-def selUserUsername(db, username):
-    return db.selectSingle('SELECT ("ID") FROM gtoverseer.user WHERE username = %s', username)
+def selUser(db, kwargs):
+    status1, user = db.selectMultiple("""
+        SELECT "username", "email"
+        FROM gtoverseer.user
+        WHERE "username" = %(username)s
+        """, kwargs)
+    status2, privileges = db.selectReturnMultiple(
+        """
+        SELECT p."name"
+        FROM gtoverseer.user_privilege up
+        LEFT JOIN gtoverseer.user u ON up."user_ID" = u."ID"
+        LEFT JOIN gtoverseer.privilege p ON up."privilege_ID" = p."ID"
+        WHERE u."username" = %(username)s
+        """, kwargs)
+    return True if status1 and status2 else False, user, privileges
 
 def selUserEmailPassword(db, kwargs):
     return db.selectMultiple("""
@@ -439,4 +461,11 @@ def deletePowerSource(db, kwargs):
     """
     DELETE FROM gtoverseer."power_source"
     WHERE "machine_ID" = %(machine_ID)s
+    """, kwargs)
+
+# User Privileges
+def deleteUserPrivilege(db, kwargs):
+    db.insert("""
+        DELETE FROM gtoverseer.user_privilege
+        WHERE "user_ID" = (SELECT "ID" FROM gtoverseer.user WHERE "username" = %(username)s)
     """, kwargs)

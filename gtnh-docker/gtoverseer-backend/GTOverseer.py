@@ -37,7 +37,8 @@ if __name__ == '__main__':
             {
                 "username":os.getenv("ADMIN_USERNAME"),
                 "email":os.getenv("ADMIN_EMAIL"),
-                "password":os.getenv("ADMIN_PASSWORD")
+                "password":os.getenv("ADMIN_PASSWORD"),
+                "privileges":["Administrator"]
             })
         if status:
             break

@@ -82,7 +82,7 @@ def apiGetUser():
     try:
         data = request.json
         db = Database(g.conn_params) # open db connection
-        return jsonify(get.getUser(db,data['username']))
+        return jsonify(get.getUser(db,data))
     except Exception as e:
         print(f"POST /api/get/user: {e}", file=sys.stderr)
         return jsonify({'status':False, 'error': str(e)})

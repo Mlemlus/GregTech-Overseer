@@ -1,9 +1,13 @@
 import data.database.query as q
-
 ##### USER #####
 def addUser(db, data):
     status, err = q.insUser(db, data)
-    return{"status":status, "error":err}
+    q.deleteUserPrivilege(db, data)
+    for priv in data["privileges"]:
+        q.insUserPrivilege(db,
+            {"username":data["username"],
+             "privilege":priv})
+    return {"status":status, "error":err}
 
 ##### CABLE #####
 def addCable(db, data):
