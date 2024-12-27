@@ -3,6 +3,11 @@ import data.database.query as q, shared as s
 ##### USER #####
 def updUser(db, data):
     status, err = q.updateUser(db, data)
+    q.deleteUserPrivilege(db,data)
+    for priv in data["privileges"]:
+        q.insUserPrivilege(db,
+            {"username":data["username"],
+             "privilege":priv})
     return {"status":status, "error":err}
 
 ##### MACHINE #####

@@ -14,6 +14,7 @@ def login(email, password):
         data = response.json()
         if data["status"] and data["username"] != None: # status is a boolean
             ss.username = data["username"][0] # set session username
+            ss.privileges = requests.post("http://10.21.31.5:40649/api/get/user",json={"username":data["username"][0]}).json()["privileges"]
             ss.logged_in = True
             ss.backlog_message = "Login successful"
         else:

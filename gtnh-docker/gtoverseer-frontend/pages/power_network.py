@@ -108,10 +108,11 @@ with st.container(height=400):
 
         if not row["Name"] == '': # display buttons if we got any pns
             # Edit button logic
-            if col5.button(label="Edit", key=f"edit_{row["Name"]}"): # needs unique key
-                ss["update_pn_clicked_old_name"] = row["Name"] # sets the name to be edited in dataframe
-                ss["delete_pn_clicked_name"] = "" # resets delete state
-                st.rerun()
+            if "Edit Power Networks" in ss.privileges or "Administrator" in ss.privileges:
+                if col5.button(label="Edit", key=f"edit_{row["Name"]}"): # needs unique key
+                    ss["update_pn_clicked_old_name"] = row["Name"] # sets the name to be edited in dataframe
+                    ss["delete_pn_clicked_name"] = "" # resets delete state
+                    st.rerun()
 
             # Edit row logic
             if ss["update_pn_clicked_old_name"] == row["Name"]:
@@ -140,10 +141,11 @@ with st.container(height=400):
                     st.form_submit_button("Confirm changes", on_click=updatePN)
 
             # Delete button logic
-            if col6.button(label="Delete", key=f"delete_{row["Name"]}"): # needs unique key
-                ss["delete_pn_clicked_name"] = row["Name"] # sets the name to be delete in dataframe
-                ss["update_pn_clicked_old_name"] = "" # Resets edit state
-                st.rerun()
+            if "Remove Power Networks" in ss.privileges or "Administrator" in ss.privileges:
+                if col6.button(label="Delete", key=f"delete_{row["Name"]}"): # needs unique key
+                    ss["delete_pn_clicked_name"] = row["Name"] # sets the name to be delete in dataframe
+                    ss["update_pn_clicked_old_name"] = "" # Resets edit state
+                    st.rerun()
             
             # Delete row logic
             if ss["delete_pn_clicked_name"] == row["Name"]:
@@ -152,26 +154,26 @@ with st.container(height=400):
                     st.rerun()
 
 
-
-## Add pn form ##
-st.write("### Add Power Network")
-# get cables list
-response = requests.get("http://10.21.31.5:40649/api/get/cable-names")
-if response.json()["status"]:
-    cables = [i[0] for i in response.json()["cables"]]
-else:
-    st.warning("No cables: First add some cables in the Utils/Cables tab")
-    st.stop()
-# Field inputs
-with st.form("uadd_form", border=False, enter_to_submit=False):
-    st.text_input(
-        "Name",
-        max_chars=50,
-        key="add_pn_name"
-    )
-    st.selectbox(
-        "Select Cable",
-        cables,
-        key="add_pn_cable_name"
-    )
-    st.form_submit_button("Add", on_click=addPN)
+if "Add Power Networks" in ss.privileges or "Administrator" in ss.privileges:
+    ## Add pn form ##
+    st.write("### Add Power Network")
+    # get cables list
+    response = requests.get("http://10.21.31.5:40649/api/get/cable-names")
+    if response.json()["status"]:
+        cables = [i[0] for i in response.json()["cables"]]
+    else:
+        st.warning("No cables: First add some cables in the Utils/Cables tab")
+        st.stop()
+    # Field inputs
+    with st.form("uadd_form", border=False, enter_to_submit=False):
+        st.text_input(
+            "Name",
+            max_chars=50,
+            key="add_pn_name"
+        )
+        st.selectbox(
+            "Select Cable",
+            cables,
+            key="add_pn_cable_name"
+        )
+        st.form_submit_button("Add", on_click=addPN)

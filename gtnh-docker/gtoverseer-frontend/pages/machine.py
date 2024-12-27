@@ -85,10 +85,11 @@ if ss["selected_filters"]:
             col.write(row[filter_name])
 
         # Edit button logic
-        if st.button(label="Edit", key=f"edit_{row["ID"]}"): # needs unique key
-            ss["update_machine_clicked_ID"] = row["ID"] # sets the machine to be edited in dataframe
-            # ss["delete_user_clicked_username"] = "" # resets delete state
-            st.rerun()
+        if "Edit Machines" in ss.privileges or "Administrator" in ss.privileges:
+            if st.button(label="Edit", key=f"edit_{row["ID"]}"): # needs unique key
+                ss["update_machine_clicked_ID"] = row["ID"] # sets the machine to be edited in dataframe
+                # ss["delete_user_clicked_username"] = "" # resets delete state
+                st.rerun()
         # Edit row logic 
         if ss["update_machine_clicked_ID"] == row["ID"]:
             # get power networks list

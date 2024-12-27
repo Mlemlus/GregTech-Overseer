@@ -73,7 +73,6 @@ CREATE TABLE "gtoverseer"."user_privilege" (
 	"ID"				SERIAL PRIMARY KEY,
 	"user_ID"			INT NOT NULL,
 	"privilege_ID"		INT NOT NULL,
-	"is_shareable"		BOOLEAN NOT NULL DEFAULT FALSE,
 
 	FOREIGN KEY ("user_ID") REFERENCES "gtoverseer"."user"("ID") ON DELETE CASCADE,
 	FOREIGN KEY ("privilege_ID") REFERENCES "gtoverseer"."privilege"("ID") ON DELETE CASCADE

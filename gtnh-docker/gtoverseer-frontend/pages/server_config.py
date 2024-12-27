@@ -1,6 +1,11 @@
 import streamlit as st, requests
 from streamlit import session_state as ss
 
+#### privilege check ####
+if "Server Configuration" not in ss.privileges and "Administrator" not in ss.privileges:
+    st.error("Unauthorized Access")
+    st.stop()
+
 #### Functions ####
 def updateConfig():
     response = requests.post(

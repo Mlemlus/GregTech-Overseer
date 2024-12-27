@@ -1,5 +1,4 @@
 import data.database.query as q, shared as s
-
 ##### USER #####
 def loginProcess(db, data):
     status, username = q.selUserEmailPassword(db, data)
@@ -10,9 +9,9 @@ def getUsers(db):
     return {"status":status, "users":users}
 
     
-def getUser(db, username):
-    status, user = q.selUserUsername(db, username)
-    return {"status":status, "user":user}
+def getUser(db, kwargs):
+    status, user, privileges = q.selUser(db, kwargs)
+    return {"status":status, "user":user, "privileges":[v[0] for v in privileges]}
 
 ##### MACHINE #####
 def getMachines(db):
