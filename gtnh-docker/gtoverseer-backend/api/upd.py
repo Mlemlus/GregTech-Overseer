@@ -32,5 +32,5 @@ def updServerConfig(data):
     s.oc_stations_update_rate = data["oc_stations_update_rate"]/1000
     s.oc_stations_reinitialization_rate = data["oc_stations_reinitialization_rate"]
     for station in s.oc_stations:
-        station["latest_config"] = False
+        s.oc_stations[station]["latest_config"] = False
     return {"status":True}
