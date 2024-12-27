@@ -17,6 +17,9 @@ if "backlog_message" not in ss: # init message that passes through page reload
 if "username" not in ss: # init login status tracking
     ss.username = ""
 
+if "privileges" not in ss:
+    ss.privileges = []
+
 #### Functions ####
 @st.cache_data
 def fetch_image(username): # get profile picture, uses mineatar.io and mojang public API
@@ -57,10 +60,12 @@ if ss.username != "":
     navigation = {
             "Reports": [dashboard],
             "Utils": [machine_page,power_source_page , pw_network_page, cable_page],
-            "Configuration": [user_config, server_config]
+            "Configuration": [user_config]
             }
-    if ss.username == os.getenv("ADMIN_USERNAME"):
+    if "Administrator" in ss.privileges:
         navigation["Administration"] = [admin_manage_user]
+    if "Server Configuration" in ss.privileges or "Administrator" in ss.privileges:
+        navigation["Configuration"].append(server_config)
     pg = st.navigation(navigation)
 else:
     pg = st.navigation([login_page])

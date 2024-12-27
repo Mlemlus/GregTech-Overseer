@@ -3,6 +3,11 @@ from streamlit import session_state as ss
 import requests
 import pandas as pd
 
+#### Admin check ####
+if "Administrator" not in ss.privileges:
+    st.error("Unauthorized Access")
+    st.stop()
+
 #### Session state inicializations ####
 if "add_user_condition" not in ss: # Condition checks for input requirements
     ss.add_user_condition = [False,False,False]
@@ -88,7 +93,7 @@ def privilegeTable(operation:str): # returns a table of privileges based on the 
     if ss[operation+"cable_edit"]: output.append("Edit Cables")
     if ss[operation+"cable_remove"]: output.append("Remove Cables")
     if ss[operation+"view_logs"]: output.append("View Logs")
-    if ss[operation+"manage_maintenance"]: output.append("Manage Maintenance")
+    if ss[operation+"server_configuration"]: output.append("Server Configuration")
     if ss[operation+"administrator"]: output.append("Administrator")
     return output
 
@@ -163,7 +168,7 @@ with st.container(height=500):
                         c4.checkbox("Remove", key="update_cable_remove", value=True if "Remove Cables" in priv else False, disabled=False)
                         c5.write("Other")
                         c5.checkbox("View Logs", key="update_view_logs", value=True if "View Logs" in priv else False, disabled=False)
-                        c5.checkbox("Manage Maintenance", key="update_manage_maintenance", value=True if "Manage Maintenance" in priv else False, disabled=False)
+                        c5.checkbox("Server Configuration", key="update_server_configuration", value=True if "Server Configuration" in priv else False, disabled=False)
                         c5.checkbox("Administrator", key="update_administrator", value=True if "Administrator" in priv else False, disabled=False)
                         # oh god what have I done
                         st.form_submit_button("Confirm changes", on_click=updateUser)
@@ -227,7 +232,7 @@ c4.checkbox("Edit", key="add_cable_edit", value=False, disabled=False)
 c4.checkbox("Remove", key="add_cable_remove", value=False, disabled=False)
 c5.write("Other")
 c5.checkbox("View Logs", key="add_view_logs", value=False, disabled=False)
-c5.checkbox("Manage Maintenance", key="add_manage_maintenance", value=False, disabled=False)
+c5.checkbox("Server Configuration", key="add_server_configuration", value=False, disabled=False)
 c5.checkbox("Administrator", key="add_administrator", value=False, disabled=False)
 
 if st.button("Add", disabled=not all(ss.add_user_condition)):

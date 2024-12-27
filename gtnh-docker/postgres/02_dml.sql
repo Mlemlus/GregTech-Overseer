@@ -35,4 +35,5 @@ INSERT INTO "gtoverseer"."privilege" ("name") VALUES -- STATIC
 	('Remove Cables'),
 	('View Logs'),
 	('Manage Maintenance'),
-	('Administrator');
+	('Administrator'),
+	('Server Configuration');

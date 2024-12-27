@@ -106,10 +106,11 @@ with st.container(height=600):
         col7.write(row["manual"])
         if not row["Name"] == '': # display buttons if we got any pss
             # Edit button logic
-            if col8.button(label="Edit", key=f"edit_{row["machine_ID"]}"): # needs unique key
-                ss["update_ps_clicked_machine_ID"] = row["machine_ID"] # sets the name to be edited in dataframe
-                ss["delete_ps_clicked_machine_ID"] = "" # resets delete state
-                st.rerun()
+            if "Edit Power Source Machines" in ss.privileges or "Administrator" in ss.privileges:
+                if col8.button(label="Edit", key=f"edit_{row["machine_ID"]}"): # needs unique key
+                    ss["update_ps_clicked_machine_ID"] = row["machine_ID"] # sets the name to be edited in dataframe
+                    ss["delete_ps_clicked_machine_ID"] = "" # resets delete state
+                    st.rerun()
 
             # Edit row logic
             if ss["update_ps_clicked_machine_ID"] == row["machine_ID"]:

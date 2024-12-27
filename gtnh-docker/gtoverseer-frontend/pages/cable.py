@@ -105,10 +105,11 @@ with st.container(height=400):
 
         if not row["Name"] == '': # display buttons if we got any cables
             # Edit button logic
-            if col6.button(label="Edit", key=f"edit_{row["Name"]}"): # needs unique key
-                ss["update_cable_old_name"] = row["Name"] # sets the name to be edited in dataframe
-                ss["delete_cable_name"] = "" # resets delete state
-                st.rerun()
+            if "Edit Cables" in ss.privileges or "Administrator" in ss.privileges:
+                if col6.button(label="Edit", key=f"edit_{row["Name"]}"): # needs unique key
+                    ss["update_cable_old_name"] = row["Name"] # sets the name to be edited in dataframe
+                    ss["delete_cable_name"] = "" # resets delete state
+                    st.rerun()
 
             # Edit row logic
             if ss["update_cable_old_name"] == row["Name"]:
@@ -164,10 +165,11 @@ with st.container(height=400):
                     st.form_submit_button("Confirm changes", on_click=updateCable)
 
             # Delete button logic
-            if col7.button(label="Delete", key=f"delete_{row["Name"]}"): # needs unique key
-                ss["delete_cable_name"] = row["Name"] # sets the name to be delete in dataframe
-                ss["update_cable_old_name"] = "" # Resets edit state
-                st.rerun()
+            if "Remove Cables" in ss.privileges or "Administrator" in ss.privileges:
+                if col7.button(label="Delete", key=f"delete_{row["Name"]}"): # needs unique key
+                    ss["delete_cable_name"] = row["Name"] # sets the name to be delete in dataframe
+                    ss["update_cable_old_name"] = "" # Resets edit state
+                    st.rerun()
 
             # Delete row logic
             if ss["delete_cable_name"] == row["Name"]:
@@ -176,50 +178,50 @@ with st.container(height=400):
                     st.rerun()
 
 
-
-## Add cable form ##
-st.write("### Add cable")
-# get tiers list
-response = requests.get("http://10.21.31.5:40649/api/get/tier-names")
-if response.json()["status"]:
-    tiers = [i[0] for i in response.json()["tiers"]]
-else:
-    st.warning("No tiers: No connection to the database or your databse is corrupt")
-    st.stop()
-# Field inputs
-with st.form("uadd_form", border=False, enter_to_submit=False):
-    st.text_input(
-        "Name",
-        max_chars=50,
-        key="add_cable_name"
-    )
-    st.selectbox(
-        "Select Tier",
-        tiers,
-        key="add_cable_tier_name"
-    )
-    st.number_input(
-        "Density",
-        min_value=1,
-        max_value=65536,
-        step=1,
-        format="%d",
-        key="add_cable_density"
-    )
-    st.number_input(
-        "Max Amp",
-        min_value=1,
-        max_value=65536,
-        step=1,
-        format="%d",
-        key="add_cable_max_amp"
-    )
-    st.number_input(
-        "Power Loss",
-        min_value=0,
-        max_value=65536,
-        step=1,
-        format="%d",
-        key="add_cable_loss"
-    )
-    st.form_submit_button("Add", on_click=addCable)
+if "Add Cables" in ss.privileges or "Administrator" in ss.privileges:
+    ## Add cable form ##
+    st.write("### Add cable")
+    # get tiers list
+    response = requests.get("http://10.21.31.5:40649/api/get/tier-names")
+    if response.json()["status"]:
+        tiers = [i[0] for i in response.json()["tiers"]]
+    else:
+        st.warning("No tiers: No connection to the database or your databse is corrupt")
+        st.stop()
+    # Field inputs
+    with st.form("uadd_form", border=False, enter_to_submit=False):
+        st.text_input(
+            "Name",
+            max_chars=50,
+            key="add_cable_name"
+        )
+        st.selectbox(
+            "Select Tier",
+            tiers,
+            key="add_cable_tier_name"
+        )
+        st.number_input(
+            "Density",
+            min_value=1,
+            max_value=65536,
+            step=1,
+            format="%d",
+            key="add_cable_density"
+        )
+        st.number_input(
+            "Max Amp",
+            min_value=1,
+            max_value=65536,
+            step=1,
+            format="%d",
+            key="add_cable_max_amp"
+        )
+        st.number_input(
+            "Power Loss",
+            min_value=0,
+            max_value=65536,
+            step=1,
+            format="%d",
+            key="add_cable_loss"
+        )
+        st.form_submit_button("Add", on_click=addCable)
