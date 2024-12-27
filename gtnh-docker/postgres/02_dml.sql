@@ -23,15 +23,14 @@ INSERT INTO "gtoverseer"."maintenance" ("message", "tool") VALUES -- STATIC
 	('Circuitry burned out.', 'Soldering Iron'),
 	('That doesn''t belong there.', 'Crowbar');
 
--- example priveleges (prob. shuld make some defaults)
-INSERT INTO "gtoverseer"."privilege" ("name") VALUES
-	('View Machine Status'),
-	('Control Machine'),
-	('Manage Machine'),
-	('View Network Status'),
-	('Manage Network'),
-	('Manage Users'),
-	('View Maintenance'),
-	('Manage Maintenance'),
+INSERT INTO "gtoverseer"."privilege" ("name") VALUES -- STATIC
+	('Edit Machines'),
+	('Remove Machines'),
+	('Edit Power Source Machines'),
+	('Add Power Networks'),
+	('Edit Power Networks'),
+	('Remove Power Networks'),
+	('Add Cables'),
+	('Edit Cables'),
 	('View Logs'),
-	('Manage Logs');
+	('Manage Maintenance');
