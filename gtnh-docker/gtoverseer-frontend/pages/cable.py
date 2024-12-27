@@ -73,14 +73,13 @@ def deleteCable():
 #### Body ####
 ## Backlog info message print ##
 if ss.backlog_message != "":
-    st.info(ss.backlog_message)
+    st.toast(ss.backlog_message)
     ss.backlog_message = ""
 
 ## Header ##
 st.write("# Cable Managment")
 
 ## select cables form ##
-st.write("### List of cables")
 response = requests.get("http://10.21.31.5:40649/api/get/cables")
 if not response.json()["status"]:
     st.error("No cables :(")

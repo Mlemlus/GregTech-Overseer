@@ -17,7 +17,7 @@ def updateConfig():
 #### Body ####
 ## Backlog info message print ##
 if ss.backlog_message != "":
-    st.info(ss.backlog_message)
+    st.toast(ss.backlog_message)
     ss.backlog_message = ""
 
 ## Header ##
@@ -31,7 +31,7 @@ if not response.json()["status"]:
 response = response.json()
 with st.form("server config form", border=False):
     st.write("#### OC sleep between updates in ms")
-    st.caption("Too low values may cause lag!")
+    st.caption("Too low values may cause lag! (From testing it's not that much)")
     st.slider(
         label="oc update rate",
         label_visibility="hidden",
@@ -40,8 +40,8 @@ with st.form("server config form", border=False):
         max_value=5000,
         value=int(response["oc_stations_update_rate"]))
 
-    st.write("#### Time between GT machine to controller reconection in minutes")
-    st.caption("Time how often OC checks for a newly connected machine")
+    st.write("#### Time between GT machine reconnection")
+    st.caption("Time how often OC checks for a newly connected machine, note that atleast one machine has to work for OC to update")
     st.slider(
         label="oc reinitialization rate",
         label_visibility="hidden",

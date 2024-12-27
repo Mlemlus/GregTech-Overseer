@@ -36,14 +36,13 @@ def updateMachine():
 #### Body ####
 ## Backlog info message print ##
 if ss.backlog_message != "":
-    st.info(ss.backlog_message)
+    st.toast(ss.backlog_message)
     ss.backlog_message = ""
 
 ## Header ##
 st.write("# Machines")
 
 ## select machines form ##
-st.write("### List of machines")
 search = st.text_input("Search", max_chars=100)
 if search: # get only searched machines
     response = requests.post("http://10.21.31.5:40649/api/search/machines", json={'search':search})
@@ -67,7 +66,7 @@ else: # get all machines
 
 # Filters
 filters = ["ID", "Name","Tier", "Amp", "Power Network", "Coord", "Chunk Loaded", "Operational", "Work Progress", "Created at", "OC Address", "Note"] 
-selected_filters = st.multiselect("Select column filters", filters, default=ss["selected_filters"])
+selected_filters = st.multiselect("Column filters", filters, default=ss["selected_filters"], placeholder="Choose options")
 if selected_filters != ss["selected_filters"]: # update only on change
     ss["selected_filters"] = selected_filters
     st.rerun()
@@ -129,4 +128,4 @@ if ss["selected_filters"]:
                     st.rerun()
         st.divider()
 else:
-    st.write("No filters selected")
+    st.info("No filters selected")

@@ -11,6 +11,8 @@ if "update_pn_clicked_old_name" not in ss: # for each pn holds the state of upda
 if "delete_pn_clicked_name" not in ss:
     ss.delete_pn_clicked_name = ""
 
+if "no_power_network" not in ss:
+    ss.no_power_network = True
 
 #### Functions ####
 def addPN():
@@ -26,7 +28,7 @@ def addPN():
                     })
             data = response.json()
             if data['status']: # returned status
-                ss.backlog_message = "Power Network added"
+                ss.backlog_message = "Added your first Power Network!" if ss.no_power_network else "Power Network added"
             else:
                 ss.backlog_message ="Failed to add power network"
         else:
@@ -69,14 +71,15 @@ def deletePN():
 #### Body ####
 ## Backlog info message print ##
 if ss.backlog_message != "":
-    st.info(ss.backlog_message)
+    st.toast(ss.backlog_message)
+    if ss.backlog_message == "Added your first Power Network!":
+        st.balloons()
     ss.backlog_message = ""
 
 ## Header ##
 st.write("# Power Network Managment")
 
 ## select pns form ##
-st.write("### List of power networks")
 response = requests.get("http://10.21.31.5:40649/api/get/power-networks")
 if response.json()["status"]:
     df = pd.DataFrame(response.json()["pns"], columns=["Name","Cable","Created at", "Owner"])
@@ -85,6 +88,8 @@ else:
     st.stop()
 if response.json()["pns"] == []:
     st.error("No Power Networks :(")
+else:
+    ss.no_power_network = False
 
 # List of pns container
 with st.container(height=400):

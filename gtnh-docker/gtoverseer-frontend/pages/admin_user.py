@@ -64,7 +64,7 @@ def deleteUser():
     data = response.json()
     ss["delete_user_clicked_username"] = "" # reset delete state
     if data['status']:
-        ss.backlog_message = "User deleted"
+        ss.backlog_message = "User deleted!"
     else:
         ss.backlog_message ="Failed to delete user"
 
@@ -73,7 +73,9 @@ def deleteUser():
 #### Body ####
 ## Backlog info message print ##
 if ss.backlog_message != "":
-    st.info(ss.backlog_message)
+    st.toast(ss.backlog_message)
+    if ss.backlog_message == "User deleted!":
+        st.balloons()
     ss.backlog_message = ""
 
 ## Header ##

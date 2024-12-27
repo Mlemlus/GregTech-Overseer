@@ -68,7 +68,7 @@ def deletePS():
 #### Body ####
 ## Backlog info message print ##
 if ss.backlog_message != "":
-    st.info(ss.backlog_message)
+    st.toast(ss.backlog_message)
     ss.backlog_message = ""
 
 ## Header ##
@@ -86,7 +86,7 @@ if response.json()["pss"] == []:
     st.error("No Power Sources :(")
 
 # List of pss container
-with st.container(height=500):
+with st.container(height=600):
     col1, col2, col3, col4, col5, col6, col7, col8, col9 = st.columns(9)
     col1.write("Name")
     col2.write("Tier")
