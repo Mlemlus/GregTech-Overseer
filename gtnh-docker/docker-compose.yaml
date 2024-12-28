@@ -14,6 +14,7 @@ services:
     volumes:
       # Required by Tailscale
       - ./tailscale/state:/var/lib/tailscale
+    devices: # it seems that on newer docker compose versions it needs to be in devices
       - /dev/net/tun:/dev/net/tun # for VPN tunnel without userspace
     cap_add:
       # Also required by Tailscale (permissions)
@@ -126,6 +127,10 @@ services:
       -c log_statement='all'
       -c log_line_prefix='%m [%p]'
       -c unix_socket_permissions='0770'
+      -c ssl='on'
+      -c ssl_cert_file='/etc/postgresql/ssl/server.crt'
+      -c ssl_key_file='/etc/postgresql/ssl/server.key'
+      -c ssl_ca_file='/etc/postgresql/ssl/root.crt'
     volumes:
       - db_gtoverseer:${POSTGRES_DATA_DIRECTORY}
       - ./postgres/db-logs:/db-logs:rw

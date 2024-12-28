@@ -20,7 +20,8 @@ def before_request(): # executes before every request
         "user": os.getenv("USER"),
         "password": os.getenv("PASSWORD"),
         "host": os.getenv("HOST"),
-        "port": os.getenv("PORT")
+        "port": os.getenv("PORT"),
+        "sslrootcert" : "./ssl/root.crt",
     }
 
 if __name__ == '__main__':
@@ -32,7 +33,8 @@ if __name__ == '__main__':
                 "user": os.getenv("USER"),
                 "password": os.getenv("PASSWORD"),
                 "host": os.getenv("HOST"),
-                "port": os.getenv("PORT")
+                "port": os.getenv("PORT"),
+                "sslrootcert" : "./ssl/root.crt",
             },
             {
                 "username":os.getenv("ADMIN_USERNAME"),
