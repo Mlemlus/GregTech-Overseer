@@ -92,7 +92,7 @@ else:
     ss.no_power_network = False
 
 # List of pns container
-with st.container(height=400):
+with st.container(height=600):
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     col1.write("Name")
     col2.write("Cable")
@@ -156,24 +156,24 @@ with st.container(height=400):
 
 if "Add Power Networks" in ss.privileges or "Administrator" in ss.privileges:
     ## Add pn form ##
-    st.write("### Add Power Network")
-    # get cables list
-    response = requests.get("http://10.21.31.5:40649/api/get/cable-names")
-    if response.json()["status"]:
-        cables = [i[0] for i in response.json()["cables"]]
-    else:
-        st.warning("No cables: First add some cables in the Utils/Cables tab")
-        st.stop()
-    # Field inputs
-    with st.form("uadd_form", border=False, enter_to_submit=False):
-        st.text_input(
-            "Name",
-            max_chars=50,
-            key="add_pn_name"
-        )
-        st.selectbox(
-            "Select Cable",
-            cables,
-            key="add_pn_cable_name"
-        )
-        st.form_submit_button("Add", on_click=addPN)
+    with st.expander("Add Power Network"):
+        # get cables list
+        response = requests.get("http://10.21.31.5:40649/api/get/cable-names")
+        if response.json()["status"]:
+            cables = [i[0] for i in response.json()["cables"]]
+        else:
+            st.warning("No cables: First add some cables in the Utils/Cables tab")
+            st.stop()
+        # Field inputs
+        with st.form("uadd_form", border=False, enter_to_submit=False):
+            st.text_input(
+                "Name",
+                max_chars=50,
+                key="add_pn_name"
+            )
+            st.selectbox(
+                "Select Cable",
+                cables,
+                key="add_pn_cable_name"
+            )
+            st.form_submit_button("Add", on_click=addPN)

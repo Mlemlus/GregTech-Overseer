@@ -110,12 +110,11 @@ if ss.backlog_message != "":
 st.write("# Admin User Managment")
 
 ## select users form ##
-st.write("### List of users")
 response = requests.get("http://10.21.31.5:40649/api/get/users")
 df = pd.DataFrame(response.json()["users"], columns=["username", "email"])
 
 # List of users container
-with st.container(height=500):
+with st.container(height=600):
     col1, col2, col3, col4 = st.columns([2, 2, 1, 1])
     col1.write("Username")
     col2.write("Email")
@@ -184,57 +183,55 @@ with st.container(height=500):
                     deleteUser()
                     st.rerun()
 
-
-
 ## Add user form ##
-st.write("### Add user")
-# Field inputs
-# due to the fact that on_change fucntion is forbidden for text_input in forms, I will not be using forms
-st.text_input(
-    "Username",  
-    max_chars=16,
-    key="add_user_username",
-    on_change=formReq,
-    args=("add_user_username","add_user",0,3)
-)
-st.text_input(
-    "Email", 
-    max_chars=50,
-    key="add_user_email",
-    on_change=formReq,
-    args=("add_user_email","add_user",1,5)
-)
-st.text_input(
-    "Password", 
-    type="password",
-    max_chars=100,
-    key="add_user_password",
-    on_change=formReq,
-    args=("add_user_password","add_user",2,8)
-)
-c1, c2, c3, c4, c5 = st.columns(5)
-# This would be much easier with multiselect or pills but it woudn't look as good
-c1.write("Machines")
-c1.checkbox("Add", key="add_machine_add", value=False, disabled=True)
-c1.checkbox("Edit", key="add_machine_edit", value=False, disabled=False)
-c1.checkbox("Remove", key="add_machine_remove", value=False, disabled=False)
-c2.write("Power Source Machines")
-c2.checkbox("Add", key="add_ps_add", value=False, disabled=True)
-c2.checkbox("Edit", key="add_ps_edit", value=False, disabled=False)
-c2.checkbox("Remove", key="add_ps_remove", value=False, disabled=True)
-c3.write("Power Networks")
-c3.checkbox("Add", key="add_pn_add", value=False, disabled=False)
-c3.checkbox("Edit", key="add_pn_edit", value=False, disabled=False)
-c3.checkbox("Remove", key="add_pn_remove", value=False, disabled=False)
-c4.write("Cables")
-c4.checkbox("Add", key="add_cable_add", value=False, disabled=False)
-c4.checkbox("Edit", key="add_cable_edit", value=False, disabled=False)
-c4.checkbox("Remove", key="add_cable_remove", value=False, disabled=False)
-c5.write("Other")
-c5.checkbox("View Logs", key="add_view_logs", value=False, disabled=False)
-c5.checkbox("Server Configuration", key="add_server_configuration", value=False, disabled=False)
-c5.checkbox("Administrator", key="add_administrator", value=False, disabled=False)
+with st.expander("Add User"):
+    # Field inputs
+    # due to the fact that on_change fucntion is forbidden for text_input in forms, I will not be using forms
+    st.text_input(
+        "Username",  
+        max_chars=16,
+        key="add_user_username",
+        on_change=formReq,
+        args=("add_user_username","add_user",0,3)
+    )
+    st.text_input(
+        "Email", 
+        max_chars=50,
+        key="add_user_email",
+        on_change=formReq,
+        args=("add_user_email","add_user",1,5)
+    )
+    st.text_input(
+        "Password", 
+        type="password",
+        max_chars=100,
+        key="add_user_password",
+        on_change=formReq,
+        args=("add_user_password","add_user",2,8)
+    )
+    c1, c2, c3, c4, c5 = st.columns(5)
+    # This would be much easier with multiselect or pills but it woudn't look as good
+    c1.write("Machines")
+    c1.checkbox("Add", key="add_machine_add", value=False, disabled=True)
+    c1.checkbox("Edit", key="add_machine_edit", value=False, disabled=False)
+    c1.checkbox("Remove", key="add_machine_remove", value=False, disabled=False)
+    c2.write("Power Source Machines")
+    c2.checkbox("Add", key="add_ps_add", value=False, disabled=True)
+    c2.checkbox("Edit", key="add_ps_edit", value=False, disabled=False)
+    c2.checkbox("Remove", key="add_ps_remove", value=False, disabled=True)
+    c3.write("Power Networks")
+    c3.checkbox("Add", key="add_pn_add", value=False, disabled=False)
+    c3.checkbox("Edit", key="add_pn_edit", value=False, disabled=False)
+    c3.checkbox("Remove", key="add_pn_remove", value=False, disabled=False)
+    c4.write("Cables")
+    c4.checkbox("Add", key="add_cable_add", value=False, disabled=False)
+    c4.checkbox("Edit", key="add_cable_edit", value=False, disabled=False)
+    c4.checkbox("Remove", key="add_cable_remove", value=False, disabled=False)
+    c5.write("Other")
+    c5.checkbox("View Logs", key="add_view_logs", value=False, disabled=False)
+    c5.checkbox("Server Configuration", key="add_server_configuration", value=False, disabled=False)
+    c5.checkbox("Administrator", key="add_administrator", value=False, disabled=False)
 
-if st.button("Add", disabled=not all(ss.add_user_condition)):
-    addUser()
-    st.rerun()
+    if st.button("Add", disabled=not all(ss.add_user_condition)):
+        addUser()
+        st.rerun()

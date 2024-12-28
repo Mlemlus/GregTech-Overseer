@@ -75,7 +75,6 @@ if ss.backlog_message != "":
 st.write("# Power Source Managment")
 
 ## select pss form ##
-st.write("### List of power sources")
 response = requests.get("http://10.21.31.5:40649/api/get/power-sources")
 if response.json()["status"]:
     df = pd.DataFrame(response.json()["pss"], columns=["Name","Tier","Output Amp", "Power Network", "Cur. Capacity", "Max Capacity", "machine_ID", "manual"])
@@ -86,7 +85,7 @@ if response.json()["pss"] == []:
     st.error("No Power Sources :(")
 
 # List of pss container
-with st.container(height=600):
+with st.container(height=700):
     col1, col2, col3, col4, col5, col6, col7, col8, col9 = st.columns(9)
     col1.write("Name")
     col2.write("Tier")
