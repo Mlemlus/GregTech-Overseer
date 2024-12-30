@@ -17,6 +17,10 @@ def updateConfig():
     data = response.json()
     if data['status']:
         ss.backlog_message = "Server Configuration Updated"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"{ss.username} updated server configuration",
+            "username":ss.username
+        })
 
 
 #### Body ####

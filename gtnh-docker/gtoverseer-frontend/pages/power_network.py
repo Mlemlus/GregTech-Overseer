@@ -29,12 +29,20 @@ def addPN():
             data = response.json()
             if data['status']: # returned status
                 ss.backlog_message = "Added your first Power Network!" if ss.no_power_network else "Power Network added"
+                requests.post("http://10.21.31.5:40649/log",json={
+                    "text":f"{ss.username} added power network {ss["add_pn_name"]}",
+                    "username":ss.username
+                })
             else:
                 ss.backlog_message ="Failed to add power network"
         else:
             ss.backlog_message="Power Network name too short"
     except Exception as e:
         ss.backlog_message = f"addPN error: {e}"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"Frontend addPN error: {e}",
+            "username":ss.username
+        })
 
 
 def updatePN():
@@ -51,21 +59,31 @@ def updatePN():
                 "cable_name":ss["update_pn_clicked_cable_name"]
                 })
         data = response.json()
-        ss["update_pn_clicked_old_name"] = "" # reset edit state
         if data['status']:
             ss.backlog_message = "Power Network updated"
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"{ss.username} updated power network {ss["update_pn_clicked_name"]}",
+                "username":ss.username
+            })
         else:
             ss.backlog_message ="Failed to update power network"
+        ss["update_pn_clicked_old_name"] = "" # reset edit state
+
 
 def deletePN():
     # post delete pn info to API
     response = requests.post("http://10.21.31.5:40649/api/delete/power-network", json={"name":ss["delete_pn_clicked_name"]})
     data = response.json()
-    ss["delete_pn_clicked_name"] = "" # reset delete state
     if data['status']:
         ss.backlog_message = "Power Network deleted"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"{ss.username} deleted power network {ss["delete_pn_clicked_name"]}",
+            "username":ss.username
+        })
     else:
         ss.backlog_message ="Failed to delete power network"
+    ss["delete_pn_clicked_name"] = "" # reset delete state
+
 
 
 #### Body ####

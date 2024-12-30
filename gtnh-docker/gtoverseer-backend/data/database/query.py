@@ -158,6 +158,22 @@ def insUserPrivilege(db, kwargs):
             (SELECT "ID" FROM gtoverseer.privilege WHERE "name" = %(privilege)s)
         )
     """, kwargs)
+
+# Log
+def insLog(db,kwargs):
+    db.insert("""
+        INSERT INTO gtoverseer.log ("text")
+        VALUES(%(text)s)
+        """,kwargs)
+
+def insLogUsername(db,kwargs):
+    db.insert("""
+        INSERT INTO gtoverseer.log ("text", "user_ID")
+        VALUES(
+              %(text)s,
+              (SELECT "ID" FROM gtoverseer.user WHERE "username" = %(username)s))
+        """,kwargs)
+
 ################## SELECT ##################
 # OC Station
 def selComputer(db, kwargs):

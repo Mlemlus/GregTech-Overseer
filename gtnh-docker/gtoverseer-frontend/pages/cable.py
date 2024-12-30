@@ -28,12 +28,20 @@ def addCable():
             data = response.json()
             if data['status']: # returned status
                 ss.backlog_message = "Cable added"
+                requests.post("http://10.21.31.5:40649/log",json={
+                    "text":f"{ss.username} added cable {ss["add_cable_name"]}",
+                    "username":ss.username
+                })
             else:
                 ss.backlog_message = f"Failed to add cable: {data["error"]}"
         else:
             ss.backlog_message="Cable name too short"
     except Exception as e:
         ss.backlog_message = f"addCable error: {e}"
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"Frontend addCable error: {e}",
+                "username":ss.username
+            })
 
 
 def updateCable():
@@ -53,21 +61,31 @@ def updateCable():
                 "loss":ss["update_cable_loss"]
                 })
         data = response.json()
-        ss["update_cable_old_name"] = "" # reset edit state
         if data['status']:
             ss.backlog_message = "Cable updated"
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"{ss.username} updated cable {ss["update_cable_name"]}",
+                "username":ss.username
+            })
         else:
             ss.backlog_message ="Failed to update cable"
+        ss["update_cable_old_name"] = "" # reset edit state
+
 
 def deleteCable():
     # post delete cable info to API
     response = requests.post("http://10.21.31.5:40649/api/delete/cable", json={"name":ss["delete_cable_name"]})
     data = response.json()
-    ss["delete_cable_name"] = "" # reset delete state
     if data['status']:
         ss.backlog_message = "Cable deleted"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"{ss.username} deleted cable {ss["delete_cable_name"]}",
+            "username":ss.username
+        })
     else:
         ss.backlog_message = f"Failed to delete cable: {data["error"]}"
+    ss["delete_cable_name"] = "" # reset delete state
+
 
 
 #### Body ####

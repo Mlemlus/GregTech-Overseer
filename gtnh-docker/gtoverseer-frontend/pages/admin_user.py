@@ -34,10 +34,18 @@ def addUser():
         data = response.json()
         if data['status']: # status is a boolean
             ss.backlog_message = "User added"
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"{ss["add_user_username"]} added",
+                "username":ss.username
+            })
         else:
             ss.backlog_message = f"Failed to add user:{data["error"]}"
     except Exception as e:
-        ss.backlog_message = f"AddUser error: {e}"
+        ss.backlog_message = f"addUser error: {e}"
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"Frontend addUser error: {e}",
+                "username":ss.username
+            })
 
 def formReq(key, form, form_position, min_length): # damn im good
     ss[f"{form}_condition"][form_position] = len(ss[key]) >= min_length
@@ -59,21 +67,30 @@ def updateUser():
                 "privileges":privilegeTable("update")
                 })
         data = response.json()
-        ss["update_user_clicked_old_username"] = "" # reset edit state
         if data['status']:
             ss.backlog_message = "User updated"
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"{ss["update_user_clicked_username"]} updated",
+                "username":ss.username
+            })
         else:
             ss.backlog_message = f"Failed to update user: {data["error"]}"
+        ss["update_user_clicked_old_username"] = "" # reset edit state
+
 
 def deleteUser():
     # post delete user info to API
     response = requests.post("http://10.21.31.5:40649/api/delete/user", json={"username":ss["delete_user_clicked_username"]})
     data = response.json()
-    ss["delete_user_clicked_username"] = "" # reset delete state
     if data['status']:
         ss.backlog_message = "User deleted!"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"{ss["delete_user_clicked_username"]} deleted",
+            "username":ss.username
+        })
     else:
         ss.backlog_message ="Failed to delete user"
+    ss["delete_user_clicked_username"] = "" # reset delete state
 
 def privilegeTable(operation:str): # returns a table of privileges based on the operation (add/edit)
     output = []

@@ -1,7 +1,7 @@
 from flask import Flask, g
 from routes.api import api_bp, initAddAdmin
 from routes.data import data_bp
-import os, time, datetime, sys, shared
+import os, time, shared, requests
 
 # init Flask
 app = Flask(__name__)
@@ -45,6 +45,8 @@ if __name__ == '__main__':
         if status:
             break
         else:
-            print(f"api.initAddAdmin: no database connection: {err}", file=sys.stderr)
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"api.initAddAdmin: no database connection: {err}"
+            })
             time.sleep(5) # wait for DB to initialize 
     app.run(debug=True, host='0.0.0.0', port=40649)

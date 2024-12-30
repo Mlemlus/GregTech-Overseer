@@ -17,10 +17,20 @@ def login(email, password):
             ss.privileges = requests.post("http://10.21.31.5:40649/api/get/user",json={"username":data["username"][0]}).json()["privileges"]
             ss.logged_in = True
             ss.backlog_message = "Login successful"
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"{ss.username} successfully logged in",
+                "username":ss.username
+            })
         else:
             ss.backlog_message ="Email or password is not valid."
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"Failed login attempt with email: {email}"
+            })
     except Exception as e:
         ss.backlog_message = f"Login error: {e}"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"Frontend login error: {e}"
+        })
 
 #### Body ####
 ## Backlog info message print ###

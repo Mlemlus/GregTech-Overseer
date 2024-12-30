@@ -4,7 +4,7 @@ import api.get as get
 import api.upd as upd
 import api.dele as dele # damn you del
 from data.database.class_db import db as Database
-import sys
+import requests
 
 api_bp = Blueprint('api', __name__)
 
@@ -27,7 +27,9 @@ def apiGetServerConfig():
     try:
         return jsonify(get.getServerConfig())
     except Exception as e:
-        print(f"GET /api/get/server-config: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/server-config: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
 
 @api_bp.route('/api/update/server-config', methods=['POST']) # update user
@@ -36,7 +38,9 @@ def apiUpdateServerConfig():
         data = request.json
         return jsonify(upd.updServerConfig(data))
     except Exception as e:
-        print(f"POST /api/update/server-config: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/update/server-config: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
 
 ##### DASHBOARD #####
@@ -46,7 +50,9 @@ def apiDashboardPowerStatus():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getPowerStatus(db))
     except Exception as e:
-        print(f"GET /api/dashboard/power-status: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/dashboard/power-status: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -57,7 +63,9 @@ def apiDashboardLastWorkedtatus():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getLastWorkedStatus(db))
     except Exception as e:
-        print(f"GET /api/dashboard/last-worked-status: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/dashboard/last-worked-status: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -72,7 +80,9 @@ def apiAuth():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.loginProcess(db, data)) # returns dict with login info
     except Exception as e:
-        print(f"POST /api/authenticate: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/authenticate: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -84,7 +94,9 @@ def apiAddUser():
         db = Database(g.conn_params) # open db connection
         return jsonify(add.addUser(db, data))
     except Exception as e:
-        print(f"POST /api/add/user: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/add/user: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -95,7 +107,9 @@ def apiGetUsers():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getUsers(db))
     except Exception as e:
-        print(f"GET /api/get/users: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/users: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -107,7 +121,9 @@ def apiGetUser():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getUser(db,data))
     except Exception as e:
-        print(f"POST /api/get/user: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/get/user: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -119,7 +135,9 @@ def apiUpdateUser():
         db = Database(g.conn_params) # open db connection
         return jsonify(upd.updUser(db, data))
     except Exception as e:
-        print(f"POST /api/update/user: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/update/user: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -131,7 +149,9 @@ def apiDeleteUser():
         db = Database(g.conn_params) # open db connection
         return jsonify(dele.delUser(db, data))
     except Exception as e:
-        print(f"POST /api/delete/user: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/delete/user: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -143,7 +163,9 @@ def apiGetMachines():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getMachines(db))
     except Exception as e:
-        print(f"GET /api/get/machines: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/machines: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -155,7 +177,9 @@ def apiSearchMachines():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.searchMachines(db,data))
     except Exception as e:
-        print(f"POST /api/search/machines: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/search/machines: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -167,7 +191,9 @@ def apiUpdateMachine():
         db = Database(g.conn_params) # open db connection
         return jsonify(upd.updMachine(db, data))
     except Exception as e:
-        print(f"POST /api/update/machine: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/update/machine: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -180,7 +206,9 @@ def apiGetPowerNetworkNames():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getPowerNetworkNames(db))
     except Exception as e:
-        print(f"GET /api/get/power-network-names: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/power-network-names: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -192,7 +220,9 @@ def apiAddPowerNetwork():
         db = Database(g.conn_params) # open db connection
         return jsonify(add.addPN(db, data))
     except Exception as e:
-        print(f"POST /api/add/power-network: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/add/power-network: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -203,7 +233,9 @@ def apiGetPowerNetworks():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getPNs(db))
     except Exception as e:
-        print(f"GET /api/get/power-networks: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/power-networks: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -215,7 +247,9 @@ def apiUpdatePowerNetwork():
         db = Database(g.conn_params) # open db connection
         return jsonify(upd.updPN(db, data))
     except Exception as e:
-        print(f"POST /api/update/cable: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/update/cable: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -227,7 +261,9 @@ def apiDeletePowerNetwork():
         db = Database(g.conn_params) # open db connection
         return jsonify(dele.delPN(db, data))
     except Exception as e:
-        print(f"POST /api/delete/power-network: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/delete/power-network: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -241,7 +277,9 @@ def apiAddCable():
         db = Database(g.conn_params) # open db connection
         return jsonify(add.addCable(db, data))
     except Exception as e:
-        print(f"POST /api/add/cable: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/add/cable: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -252,7 +290,9 @@ def apiGetCables():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getCables(db))
     except Exception as e:
-        print(f"GET /api/get/cables: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/cables: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -263,7 +303,9 @@ def apiGetCableNames():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getCableNames(db))
     except Exception as e:
-        print(f"GET /api/get/cable-names: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/cable-names: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -275,7 +317,9 @@ def apiUpdateCable():
         db = Database(g.conn_params) # open db connection
         return jsonify(upd.updCable(db, data))
     except Exception as e:
-        print(f"POST /api/update/cable: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/update/cable: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -287,7 +331,9 @@ def apiDeleteCable():
         db = Database(g.conn_params) # open db connection
         return jsonify(dele.delCable(db, data))
     except Exception as e:
-        print(f"POST /api/delete/cable: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/delete/cable: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -300,7 +346,9 @@ def apiGetTierNames():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getTierNames(db))
     except Exception as e:
-        print(f"GET /api/get/tier-names: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/tier-names: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -313,7 +361,9 @@ def apiAddPowerSource():
         db = Database(g.conn_params) # open db connection
         return jsonify(add.addPS(db, data))
     except Exception as e:
-        print(f"POST /api/add/power-source: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/add/power-source: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -324,7 +374,9 @@ def apiGetPowerSources():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getPSs(db))
     except Exception as e:
-        print(f"GET /api/get/power-sources: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/power-sources: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -336,7 +388,9 @@ def apiGetPowerSource():
         db = Database(g.conn_params) # open db connection
         return jsonify(get.getPS(db,data))
     except Exception as e:
-        print(f"GET /api/get/power-source: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"GET /api/get/power-source: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -348,7 +402,9 @@ def apiUpdatePowerSource():
         db = Database(g.conn_params) # open db connection
         return jsonify(upd.updPS(db, data))
     except Exception as e:
-        print(f"POST /api/update/power-source: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/update/power-source: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db
@@ -360,7 +416,9 @@ def apiDeletePowerSource():
         db = Database(g.conn_params) # open db connection
         return jsonify(dele.delPS(db, data))
     except Exception as e:
-        print(f"POST /api/delete/power-source: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/delete/power-source: {e}"
+            })
         return jsonify({'status':False, 'error': str(e)})
     finally:
         del db

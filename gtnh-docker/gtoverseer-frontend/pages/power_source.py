@@ -24,10 +24,18 @@ def addPS():
         data = response.json()
         if data['status']: # returned status
             ss.backlog_message = "Power Source added"
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"{ss.username} added power source",
+                "username":ss.username
+            })
         else:
             ss.backlog_message ="Failed to add power source"
     except Exception as e:
         ss.backlog_message = f"addPS error: {e}"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"Frontend addPS error: {e}",
+            "username":ss.username
+        })
 
 
 def updatePS():
@@ -51,6 +59,10 @@ def updatePS():
         ss["update_ps_clicked_machine_ID"] = "" # reset edit state
         if data['status']:
             ss.backlog_message = "Power Source updated"
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"{ss.username} updated power source {ss["update_ps_name"]}",
+                "username":ss.username
+            })
         else:
             ss.backlog_message ="Failed to update power source"
 
@@ -61,6 +73,10 @@ def deletePS():
     ss["delete_ps_clicked_machine_ID"] = "" # reset delete state
     if data['status']:
         ss.backlog_message = "Power Source deleted"
+        requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"{ss.username} deleted power source machine_ID:{ss["delete_ps_clicked_machine_ID"]}",
+            "username":ss.username
+        })
     else:
         ss.backlog_message ="Failed to delete power source"
 

@@ -1,4 +1,4 @@
-import re, sys
+import re, requests
 def parseIntialData(data): # Processes the recieved OC data to structured data
     tbl = {}
 
@@ -51,7 +51,9 @@ def parseIntialData(data): # Processes the recieved OC data to structured data
                 val["amp"] = amp 
             tbl[i] = val # add the machine to the table
         except Exception as e:
-            print(f"data_parse.parseIntialData:{data[str(i)]["machine"]["name"]}: {e}",file=sys.stderr)
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"data_parse.parseIntialData:{data[str(i)]["machine"]["name"]}: {e}"
+            })
     return tbl
 
 def nearestTier(val): # returns tier eu of the val
@@ -66,7 +68,9 @@ def nearestTier(val): # returns tier eu of the val
             else:
                 nearest = nearest * 4
     except Exception as e:
-        print(f"data_parse.nearestTier: Failed to find the nearest tier for {val}, err: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"data_parse.nearestTier: Failed to find the nearest tier for {val}, err: {e}"
+            })
         return 0,0
     return int(nearest), int(multiplier)
 
@@ -113,7 +117,9 @@ def parseSensorInfo(sensor_info): # Extracts what it can from sensor data (the i
                 else:
                     continue
         except Exception as e:
-            print(f"data_parse.parseSensorInfo: Failed parse line {row} in sensor_info : {e}", file=sys.stderr)
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"data_parse.parseSensorInfo: Failed parse line {row} in sensor_info : {e}"
+            })
             continue
 
     return parsed_data

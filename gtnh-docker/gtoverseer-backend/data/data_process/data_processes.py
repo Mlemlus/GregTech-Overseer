@@ -1,5 +1,5 @@
 import data.database.query as q
-import sys
+import requests
 
 def insRestart(db, data): # Handling of data for the OC reinitialization
     # convert table tier to dictionary
@@ -23,7 +23,9 @@ def insRestart(db, data): # Handling of data for the OC reinitialization
             q.insMachine(db, data[i])
             q.insCoord(db, data[i])
         except Exception as e: # we keep this on the hush hush
-            print(f"data_processes.insRestart: Failed to insert machine {data[i]["name"]}: {e}", file=sys.stderr)
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"data_processes.insRestart: Failed to insert machine {data[i]["name"]}: {e}"
+            })
             continue
         if "is_power_source" in data[i]:
             q.insPowerSource(db, data[i])
@@ -34,6 +36,15 @@ def updWork(db, data): # The sauce, updates the database with work progress of t
         try:
             q.updWork(db, data[str(i)])
         except Exception as e:
-            print(f"data_processes.updWork: Failed to update work: {e}", file=sys.stderr)
+            requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"data_processes.updWork: Failed to update work: {e}"
+            })
             continue
     return True
+
+def logStatus(db, kwargs):
+    if "username" in kwargs:
+        q.insLogUsername(db,kwargs)
+    else:
+        q.insLog(db,kwargs)
+    return {"status":True}

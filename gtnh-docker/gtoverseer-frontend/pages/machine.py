@@ -26,11 +26,16 @@ def updateMachine():
                         "chunkloaded":ss["update_machine_clicked_chunk_loaded"],
                         "note":ss["update_machine_clicked_note"]})
         data = response.json()
-        ss["update_machine_clicked_ID"] = "" # reset edit state
         if data['status']:
             ss.backlog_message = "Machine updated"
+            requests.post("http://10.21.31.5:40649/log",json={
+            "text":f"{ss.username} updated machine {ss["update_machine_clicked_name"]}",
+            "username":ss.username
+        })
         else:
             ss.backlog_message ="Failed to update machine"
+        ss["update_machine_clicked_ID"] = "" # reset edit state
+
 
 
 #### Body ####

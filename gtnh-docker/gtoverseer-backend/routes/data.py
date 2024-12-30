@@ -1,8 +1,8 @@
-from flask import request, Blueprint, g
+from flask import request, Blueprint, g, jsonify
 from data.database.class_db import db as Database
-import sys, shared as s, datetime as dt
+import sys, shared as s, datetime as dt, requests
 from data.data_process.data_parse import parseIntialData
-from data.data_process.data_processes import insRestart, updWork
+from data.data_process.data_processes import insRestart, updWork, logStatus
 
 data_bp = Blueprint("data", __name__)
 
@@ -48,7 +48,9 @@ def handleDataRequest():
                 override_task = "204" + resetConfig() # Sends new config
 
     except Exception as e:
-        print(f"handleDataRequest: {e}", file=sys.stderr)
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"handleDataRequest: {e}"
+            })
         return "500" + f"handleDataRequest: {e}"
     # if one of the status tasks failed, the next task gets overriden
     if override_task != None:
@@ -79,3 +81,16 @@ def resetConfig(): # returns OC station configuration string
     config_string = []
     config_string.append(s.oc_stations_update_rate)
     return ",".join(str(val) for val in config_string) # pog
+
+############ Log handling ############
+@data_bp.route("/log", methods=["POST"]) # logs incoming data
+def handleLogStatus():
+    # try:
+    data = request.json
+    db = Database(g.conn_params) # open db connection
+    return jsonify(logStatus(db, data))
+    # except Exception as e:
+    #     print(f"POST /log: {e}", file=sys.stderr) # who reports the reporter?
+    #     return jsonify({'status':False, 'error': str(e)})
+    # finally:
+    #     del db
