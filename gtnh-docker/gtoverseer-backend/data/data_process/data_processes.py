@@ -35,6 +35,8 @@ def updWork(db, data): # The sauce, updates the database with work progress of t
     for i in range(1,len(data)+1):
         try:
             q.updWork(db, data[str(i)])
+            if "eu_capacity_current" in data[str(i)]:
+                q.updCapacity(db,data[str(i)])
         except Exception as e:
             requests.post("http://10.21.31.5:40649/log",json={
                 "text":f"data_processes.updWork: Failed to update work: {e}"

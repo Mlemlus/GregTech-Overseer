@@ -479,6 +479,15 @@ def updatePowerSource(db, kwargs):
         WHERE "ID" = %(machine_ID)s;
         """, kwargs)
 
+def updCapacity(db, kwargs):
+    db.update("""
+        UPDATE gtoverseer."power_source"
+        SET 
+            "current_capacity" = %(eu_capacity_current)s
+        WHERE 
+            "machine_ID" = (SELECT "ID" FROM gtoverseer.machine WHERE oc_address = %(oc_address)s)
+    """, kwargs)
+
 ################## DELETE ##################
 # User
 def deleteUser(db, kwargs):
