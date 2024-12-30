@@ -48,3 +48,7 @@ def logStatus(db, kwargs):
     else:
         q.insLog(db,kwargs)
     return {"status":True}
+
+def getLogStatus(db):
+    status, log = q.getLog(db)
+    return {"status":status, "log":log}

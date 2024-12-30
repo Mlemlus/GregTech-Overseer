@@ -347,6 +347,15 @@ def selLastWorkedStatus(db):
     LEFT JOIN gtoverseer.work w ON w."machine_ID" = m."ID"
     """)
 
+# Log
+def getLog(db):
+    return db.select("""
+        SELECT "time", "text"
+        FROM gtoverseer.log
+        ORDER BY "time" DESC
+        LIMIT 5
+        """)
+
 ################## UPDATE ##################
 # Work
 def updWork(db, kwargs):

@@ -2,7 +2,7 @@ from flask import request, Blueprint, g, jsonify
 from data.database.class_db import db as Database
 import sys, shared as s, datetime as dt, requests
 from data.data_process.data_parse import parseIntialData
-from data.data_process.data_processes import insRestart, updWork, logStatus
+from data.data_process.data_processes import insRestart, updWork, logStatus, getLogStatus
 
 data_bp = Blueprint("data", __name__)
 
@@ -84,13 +84,24 @@ def resetConfig(): # returns OC station configuration string
 
 ############ Log handling ############
 @data_bp.route("/log", methods=["POST"]) # logs incoming data
-def handleLogStatus():
-    # try:
-    data = request.json
-    db = Database(g.conn_params) # open db connection
-    return jsonify(logStatus(db, data))
-    # except Exception as e:
-    #     print(f"POST /log: {e}", file=sys.stderr) # who reports the reporter?
-    #     return jsonify({'status':False, 'error': str(e)})
-    # finally:
-    #     del db
+def handlePostLogStatus():
+    try:
+        data = request.json
+        db = Database(g.conn_params) # open db connection
+        return jsonify(logStatus(db, data))
+    except Exception as e:
+        print(f"POST /log: {e}", file=sys.stderr) # who reports the reporter?
+        return jsonify({'status':False, 'error': str(e)})
+    finally:
+        del db
+
+@data_bp.route("/log", methods=["GET"]) # returns logs
+def handleGetLogStatus():
+    try:
+        db = Database(g.conn_params) # open db connection
+        return jsonify(getLogStatus(db))
+    except Exception as e:
+        print(f"GET /log: {e}", file=sys.stderr) # who reports the reporter?
+        return jsonify({'status':False, 'error': str(e)})
+    finally:
+        del db

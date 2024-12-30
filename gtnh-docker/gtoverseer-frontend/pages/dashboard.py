@@ -123,6 +123,15 @@ def powerStatus():
     )
     st.plotly_chart(chart)
 
+@st.fragment(run_every=5)
+def logStatus():
+    response = requests.get("http://10.21.31.5:40649/log")
+    if response.json()["status"]:
+        logs = response.json()["log"]
+    else:
+        logs = []
+    for row in logs:
+        st.write(f"{row[0][4:-4]}: {row[1]}")
 
 # @st.fragment(run_every=5)
 # def metricsStatus():
@@ -180,7 +189,9 @@ with col2:
     )
     st.plotly_chart(pie_chart) # plot that shit
 
+col1, col2 = st.columns(2)
+with col1:
+    logStatus()
 
 # Metrics Status
 # metricsStatus()
-
