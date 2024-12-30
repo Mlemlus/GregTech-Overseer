@@ -67,3 +67,7 @@ def getServerConfig():
 def getPowerStatus(db):
     status, power_status = q.selPowerStatus(db)
     return {"status":status, "power_status":power_status}
+
+def getLastWorkedStatus(db):
+    status, last_worked_status = q.selLastWorkedStatus(db)
+    return {"status":status, "last_worked_status":last_worked_status}
