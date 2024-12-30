@@ -39,6 +39,29 @@ def apiUpdateServerConfig():
         print(f"POST /api/update/server-config: {e}", file=sys.stderr)
         return jsonify({'status':False, 'error': str(e)})
 
+##### DASHBOARD #####
+@api_bp.route('/api/dashboard/power-status', methods=['GET']) # get Power Status data
+def apiDashboardPowerStatus():
+    try:
+        db = Database(g.conn_params) # open db connection
+        return jsonify(get.getPowerStatus(db))
+    except Exception as e:
+        print(f"GET /api/dashboard/power-status: {e}", file=sys.stderr)
+        return jsonify({'status':False, 'error': str(e)})
+    finally:
+        del db
+
+@api_bp.route('/api/dashboard/last-worked-status', methods=['GET']) # get Power Status data
+def apiDashboardLastWorkedtatus():
+    try:
+        db = Database(g.conn_params) # open db connection
+        return jsonify(get.getLastWorkedStatus(db))
+    except Exception as e:
+        print(f"GET /api/dashboard/last-worked-status: {e}", file=sys.stderr)
+        return jsonify({'status':False, 'error': str(e)})
+    finally:
+        del db
+
 
 ####### CRUD #######
 ##### USER #####

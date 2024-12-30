@@ -317,6 +317,20 @@ def selPowerSource(db, kwargs):
         WHERE ps."machine_ID" = %(machine_ID)s
         """, kwargs)
 
+# Dashboard
+def selPowerStatus(db):
+    return db.select("""
+        SELECT "total_power_usage", "total_power_capacity"
+        FROM gtoverseer."power_status"
+        """)
+
+def selLastWorkedStatus(db):
+    return db.select("""
+    SELECT COALESCE(m."custom_name", m."name"), w."last_worked_at"
+    FROM gtoverseer.machine m
+    LEFT JOIN gtoverseer.work w ON w."machine_ID" = m."ID"
+    """)
+
 ################## UPDATE ##################
 # Work
 def updWork(db, kwargs):

@@ -3,7 +3,7 @@ FROM python:bookworm
 WORKDIR /usr/src/app
 
 RUN apt update && apt upgrade -y
-RUN pip install --no-cache-dir altair pandas streamlit
+RUN pip install --no-cache-dir altair pandas streamlit plotly
 
 COPY . .
 
