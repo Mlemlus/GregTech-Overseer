@@ -10,6 +10,10 @@ def updUser(db, data):
              "privilege":priv})
     return {"status":status, "error":err}
 
+def updUserPassword(db, data):
+    status, err = q.updateUserPassword(db, data)
+    return {"status":status, "error":err}
+
 ##### MACHINE #####
 def updMachine(db, data):
     if not data["pnname"] or data["pnname"] == "None": # rewrite None to SQL NULL

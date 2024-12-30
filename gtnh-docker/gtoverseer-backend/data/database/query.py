@@ -394,6 +394,16 @@ def updateUser(db, kwargs): # sometimes, my genius scares me
         )
         """, kwargs)
 
+def updateUserPassword(db, kwargs):
+    return db.update(
+        """
+        UPDATE gtoverseer.user
+        SET
+            "password_hash" = gtoverseer.crypt(%(new_password)s, gtoverseer.gen_salt('bf'))
+        WHERE
+            "username" = %(username)s
+        """, kwargs)
+
 # Machine
 def updateMachine(db, kwargs):
     return db.update(

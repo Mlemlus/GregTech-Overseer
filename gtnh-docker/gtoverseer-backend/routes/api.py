@@ -142,6 +142,20 @@ def apiUpdateUser():
     finally:
         del db
 
+@api_bp.route('/api/update/user-password', methods=['POST']) # update user password
+def apiUpdateUserPassword():
+    try:
+        data = request.json
+        db = Database(g.conn_params) # open db connection
+        return jsonify(upd.updUserPassword(db, data))
+    except Exception as e:
+        requests.post("http://10.21.31.5:40649/log",json={
+                "text":f"POST /api/update/user-password: {e}"
+            })
+        return jsonify({'status':False, 'error': str(e)})
+    finally:
+        del db
+
 @api_bp.route('/api/delete/user', methods=['POST']) # delete user
 def apiDeleteUser():
     try:
