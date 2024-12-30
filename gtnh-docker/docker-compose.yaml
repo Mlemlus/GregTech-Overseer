@@ -77,6 +77,8 @@ services:
       ADMIN_USERNAME: "${ADMIN_USERNAME}"
       ADMIN_EMAIL: "${ADMIN_EMAIL}"
       ADMIN_PASSWORD: "${ADMIN_PASSWORD}"
+      UPDATE_RATE: "${GTO_DEFAULT_UPDATE_RATE}"
+      REINITIALIZATION_RATE: "${GTO_DEFAULT_REINITIALIZATION_RATE}"
     networks:
       backend:
         ipv4_address: 10.21.31.5
@@ -87,6 +89,8 @@ services:
     build:
       context: ./postgres
       dockerfile: Dockerfile
+      args:
+        PGDATA: "${POSTGRES_DATA_DIRECTORY}"
     container_name: GTOverseer_postgre
     restart: ${RESTART_POLICY}
     environment:
@@ -132,7 +136,7 @@ services:
       -c ssl_key_file='/etc/postgresql/ssl/server.key'
       -c ssl_ca_file='/etc/postgresql/ssl/root.crt'
     volumes:
-      - db_gtoverseer:${POSTGRES_DATA_DIRECTORY}
+      - ${POSTGRES_DATA_DIRECTORY_LOCAL}:${POSTGRES_DATA_DIRECTORY}
       - ./postgres/db-logs:/db-logs:rw
       - ./postgres/db-backups:/db-backups:rw
     ports:

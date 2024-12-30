@@ -10,8 +10,8 @@ app.register_blueprint(data_bp)
 
 # init shared vals
 shared.oc_stations = {}
-shared.oc_stations_update_rate = 3 # seconds
-shared.oc_stations_reinitialization_rate = 5 # minutes
+shared.oc_stations_update_rate = int(os.getenv("UPDATE_RATE"))
+shared.oc_stations_reinitialization_rate = int(os.getenv("REINITIALIZATION_RATE"))
 
 @app.before_request
 def before_request(): # executes before every request

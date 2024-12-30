@@ -4,6 +4,13 @@ FROM postgres:17-bookworm
 COPY *.sql /docker-entrypoint-initdb.d/
 COPY *.sh /docker-entrypoint-initdb.d/
 
+# move backup scripts
+RUN mkdir ${PGDATA}/../scripts
+RUN mv /docker-entrypoint-initdb.d/backup.sh ${PGDATA}/../scripts/backup.sh
+RUN mv /docker-entrypoint-initdb.d/restore.sh ${PGDATA}/../scripts/restore.sh
+RUN chmod -R +x ${PGDATA}/../scripts/
+RUN chown -R postgres:postgres ${PGDATA}/..
+
 # pass them network restrictions
 COPY ./pg_hba.conf /etc/postgresql/pg_hba.conf
 
