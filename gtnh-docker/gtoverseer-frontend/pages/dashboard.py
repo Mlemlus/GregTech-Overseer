@@ -190,8 +190,9 @@ with col2:
     st.plotly_chart(pie_chart) # plot that shit
 
 col1, col2 = st.columns(2)
-with col1:
-    logStatus()
+if "View Logs" in ss.privileges or "Administrator" in ss.privileges:
+    with col1:
+        logStatus()
 
 # Metrics Status
 # metricsStatus()

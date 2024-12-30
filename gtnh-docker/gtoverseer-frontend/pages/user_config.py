@@ -48,4 +48,4 @@ with st.form("change_password_form"):
             st.warning("New password must be at least 8 characters long")
         else:
             changePassword(new_password)
-            st.rerun()\
+            st.rerun()
