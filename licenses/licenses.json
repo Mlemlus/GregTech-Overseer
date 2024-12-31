@@ -1,0 +1,324 @@
+[
+  {
+    "Author": "Sebastian Thiel, Michael Trier",
+    "License": "BSD License",
+    "Name": "GitPython",
+    "URL": "https://github.com/gitpython-developers/GitPython",
+    "Version": "3.1.43"
+  },
+  {
+    "Author": "UNKNOWN",
+    "License": "BSD License",
+    "Name": "Jinja2",
+    "URL": "https://github.com/pallets/jinja/",
+    "Version": "3.1.5"
+  },
+  {
+    "Author": "UNKNOWN",
+    "License": "BSD License",
+    "Name": "MarkupSafe",
+    "URL": "https://github.com/pallets/markupsafe/",
+    "Version": "3.0.2"
+  },
+  {
+    "Author": "Georg Brandl <georg@python.org>",
+    "License": "BSD License",
+    "Name": "Pygments",
+    "URL": "https://pygments.org",
+    "Version": "2.18.0"
+  },
+  {
+    "Author": "Vega-Altair Contributors",
+    "License": "BSD License",
+    "Name": "altair",
+    "URL": "https://github.com/vega/altair",
+    "Version": "5.5.0"
+  },
+  {
+    "Author": "Hynek Schlawack <hs@ox.cx>",
+    "License": "UNKNOWN",
+    "Name": "attrs",
+    "URL": "https://www.attrs.org/en/stable/changelog.html",
+    "Version": "24.3.0"
+  },
+  {
+    "Author": "Jason Kirtland",
+    "License": "MIT License",
+    "Name": "blinker",
+    "URL": "https://github.com/pallets-eco/blinker/",
+    "Version": "1.9.0"
+  },
+  {
+    "Author": "Thomas Kemmer",
+    "License": "MIT License",
+    "Name": "cachetools",
+    "URL": "https://github.com/tkem/cachetools/",
+    "Version": "5.5.0"
+  },
+  {
+    "Author": "Kenneth Reitz",
+    "License": "Mozilla Public License 2.0 (MPL 2.0)",
+    "Name": "certifi",
+    "URL": "https://github.com/certifi/python-certifi",
+    "Version": "2024.12.14"
+  },
+  {
+    "Author": "\"Ahmed R. TAHRI\" <tahri.ahmed@proton.me>",
+    "License": "MIT License",
+    "Name": "charset-normalizer",
+    "URL": "https://github.com/jawah/charset_normalizer/blob/master/CHANGELOG.md",
+    "Version": "3.4.1"
+  },
+  {
+    "Author": "UNKNOWN",
+    "License": "BSD License",
+    "Name": "click",
+    "URL": "https://github.com/pallets/click/",
+    "Version": "8.1.8"
+  },
+  {
+    "Author": "Sebastian Thiel",
+    "License": "BSD License",
+    "Name": "gitdb",
+    "URL": "https://github.com/gitpython-developers/gitdb",
+    "Version": "4.0.11"
+  },
+  {
+    "Author": "Kim Davies <kim+pypi@gumleaf.org>",
+    "License": "BSD License",
+    "Name": "idna",
+    "URL": "https://github.com/kjd/idna",
+    "Version": "3.10"
+  },
+  {
+    "Author": "Julian Berman <Julian+jsonschema@GrayVines.com>",
+    "License": "MIT License",
+    "Name": "jsonschema",
+    "URL": "https://github.com/python-jsonschema/jsonschema",
+    "Version": "4.23.0"
+  },
+  {
+    "Author": "Julian Berman <Julian+jsonschema-specifications@GrayVines.com>",
+    "License": "MIT License",
+    "Name": "jsonschema-specifications",
+    "URL": "https://github.com/python-jsonschema/jsonschema-specifications",
+    "Version": "2024.10.1"
+  },
+  {
+    "Author": "Chris Sewell <chrisj_sewell@hotmail.com>",
+    "License": "MIT License",
+    "Name": "markdown-it-py",
+    "URL": "https://github.com/executablebooks/markdown-it-py",
+    "Version": "3.0.0"
+  },
+  {
+    "Author": "Taneli Hukkinen <hukkin@users.noreply.github.com>",
+    "License": "MIT License",
+    "Name": "mdurl",
+    "URL": "https://github.com/executablebooks/mdurl",
+    "Version": "0.1.2"
+  },
+  {
+    "Author": "Marco Gorelli <33491632+MarcoGorelli@users.noreply.github.com>",
+    "License": "MIT License",
+    "Name": "narwhals",
+    "URL": "https://github.com/narwhals-dev/narwhals",
+    "Version": "1.20.1"
+  },
+  {
+    "Author": "Travis E. Oliphant et al.",
+    "License": "BSD License",
+    "Name": "numpy",
+    "URL": "https://numpy.org",
+    "Version": "2.2.1"
+  },
+  {
+    "Author": "Donald Stufft <donald@stufft.io>",
+    "License": "Apache Software License; BSD License",
+    "Name": "packaging",
+    "URL": "https://github.com/pypa/packaging",
+    "Version": "24.2"
+  },
+  {
+    "Author": "The Pandas Development Team <pandas-dev@python.org>",
+    "License": "BSD License",
+    "Name": "pandas",
+    "URL": "https://pandas.pydata.org",
+    "Version": "2.2.3"
+  },
+  {
+    "Author": "\"Jeffrey A. Clark\" <aclark@aclark.net>",
+    "License": "CMU License (MIT-CMU)",
+    "Name": "pillow",
+    "URL": "https://python-pillow.org",
+    "Version": "11.0.0"
+  },
+  {
+    "Author": "Chris P",
+    "License": "MIT License",
+    "Name": "plotly",
+    "URL": "https://plotly.com/python/",
+    "Version": "5.24.1"
+  },
+  {
+    "Author": "protobuf@googlegroups.com",
+    "License": "3-Clause BSD License",
+    "Name": "protobuf",
+    "URL": "https://developers.google.com/protocol-buffers/",
+    "Version": "5.29.2"
+  },
+  {
+    "Author": "UNKNOWN",
+    "License": "Apache Software License",
+    "Name": "pyarrow",
+    "URL": "https://arrow.apache.org/",
+    "Version": "18.1.0"
+  },
+  {
+    "Author": "Andrew Duberstein",
+    "License": "Apache License 2.0",
+    "Name": "pydeck",
+    "URL": "https://github.com/visgl/deck.gl/tree/master/bindings/pydeck",
+    "Version": "0.9.1"
+  },
+  {
+    "Author": "Gustavo Niemeyer",
+    "License": "Apache Software License; BSD License",
+    "Name": "python-dateutil",
+    "URL": "https://github.com/dateutil/dateutil",
+    "Version": "2.9.0.post0"
+  },
+  {
+    "Author": "Stuart Bishop",
+    "License": "MIT License",
+    "Name": "pytz",
+    "URL": "http://pythonhosted.org/pytz",
+    "Version": "2024.2"
+  },
+  {
+    "Author": "Julian Berman <Julian+referencing@GrayVines.com>",
+    "License": "MIT License",
+    "Name": "referencing",
+    "URL": "https://github.com/python-jsonschema/referencing",
+    "Version": "0.35.1"
+  },
+  {
+    "Author": "Kenneth Reitz",
+    "License": "Apache Software License",
+    "Name": "requests",
+    "URL": "https://requests.readthedocs.io",
+    "Version": "2.32.3"
+  },
+  {
+    "Author": "Will McGugan",
+    "License": "MIT License",
+    "Name": "rich",
+    "URL": "https://github.com/Textualize/rich",
+    "Version": "13.9.4"
+  },
+  {
+    "Author": "Julian Berman <Julian+rpds@GrayVines.com>",
+    "License": "MIT License",
+    "Name": "rpds-py",
+    "URL": "https://github.com/crate-py/rpds",
+    "Version": "0.22.3"
+  },
+  {
+    "Author": "Benjamin Peterson",
+    "License": "MIT License",
+    "Name": "six",
+    "URL": "https://github.com/benjaminp/six",
+    "Version": "1.17.0"
+  },
+  {
+    "Author": "Sebastian Thiel",
+    "License": "BSD License",
+    "Name": "smmap",
+    "URL": "https://github.com/gitpython-developers/smmap",
+    "Version": "5.0.1"
+  },
+  {
+    "Author": "Snowflake Inc",
+    "License": "Apache Software License",
+    "Name": "streamlit",
+    "URL": "https://streamlit.io",
+    "Version": "1.41.1"
+  },
+  {
+    "Author": "Julien Danjou",
+    "License": "Apache Software License",
+    "Name": "tenacity",
+    "URL": "https://github.com/jd/tenacity",
+    "Version": "9.0.0"
+  },
+  {
+    "Author": "William Pearson",
+    "License": "MIT License",
+    "Name": "toml",
+    "URL": "https://github.com/uiri/toml",
+    "Version": "0.10.2"
+  },
+  {
+    "Author": "Facebook",
+    "License": "Apache Software License",
+    "Name": "tornado",
+    "URL": "http://www.tornadoweb.org/",
+    "Version": "6.4.2"
+  },
+  {
+    "Author": "\"Guido van Rossum, Jukka Lehtosalo, \u0141ukasz Langa, Michael Lee\" <levkivskyi@gmail.com>",
+    "License": "Python Software Foundation License",
+    "Name": "typing_extensions",
+    "URL": "https://github.com/python/typing_extensions",
+    "Version": "4.12.2"
+  },
+  {
+    "Author": "Python Software Foundation",
+    "License": "Apache Software License",
+    "Name": "tzdata",
+    "URL": "https://github.com/python/tzdata",
+    "Version": "2024.2"
+  },
+  {
+    "Author": "Andrey Petrov <andrey.petrov@shazow.net>",
+    "License": "MIT License",
+    "Name": "urllib3",
+    "URL": "https://github.com/urllib3/urllib3/blob/main/CHANGES.rst",
+    "Version": "2.3.0"
+  },
+  {
+    "Author": "Micka\u00ebl Schoentgen",
+    "License": "Apache Software License",
+    "Name": "watchdog",
+    "URL": "https://github.com/gorakhargosh/watchdog",
+    "Version": "6.0.0"
+  },
+  {
+    "Author": "UNKNOWN",
+    "License": "BSD License",
+    "Name": "Flask",
+    "URL": "https://github.com/pallets/flask/",
+    "Version": "3.1.0"
+  },
+  {
+    "Author": "UNKNOWN",
+    "License": "BSD License",
+    "Name": "Werkzeug",
+    "URL": "UNKNOWN",
+    "Version": "3.1.3"
+  },
+  {
+    "Author": "UNKNOWN",
+    "License": "BSD License",
+    "Name": "itsdangerous",
+    "URL": "https://github.com/pallets/itsdangerous/",
+    "Version": "2.2.0"
+  },
+  {
+    "Author": "Federico Di Gregorio",
+    "License": "GNU Library or Lesser General Public License (LGPL)",
+    "Name": "psycopg2-binary",
+    "URL": "https://psycopg.org/",
+    "Version": "2.9.10"
+  }
+]

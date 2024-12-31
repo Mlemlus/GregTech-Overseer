@@ -49,4 +49,4 @@ if __name__ == '__main__':
                 "text":f"api.initAddAdmin: no database connection: {err}"
             })
             time.sleep(5) # wait for DB to initialize 
-    app.run(debug=True, host='0.0.0.0', port=40649)
+    app.run(debug=False, host='0.0.0.0', port=40649)
