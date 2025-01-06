@@ -1,11 +1,11 @@
 # GregTech Overseer
-> The one stop shop for hosting and monitoring a GTNH server
----
+> Due to the removal of OC function `getInputVoltage`, which I used to determine tiers, at GTNH version 2.7.2 I guess this project is on hiatus.
+
+Stil works on 2.6.1
 ## Features
 - **GT machines monitoring:** GT Overseer collects all information it can about connected machines and provides it to you in summarized form.
 - **Whole GTNH in one package**: The docker stack includes the GTNH server, GT Overseer and Tailscale which manages networking so you and your friends can easily play together.
 - **Trivial setup**: Literally just look down how easy it is to install. 
----
 ## Installation
 1. Download the latest release
 2. Unzip it
@@ -23,7 +23,6 @@ docker compose up -d
 	4. Enable the subnet (default 10.20.30.0/24)
 	5. Save
 6. After `docker compose` finishes you can log in
----
 ## Usage
 - When the docker stack is running access the application with your defined IP
 	- Default is `http://10.20.30.40/`
@@ -39,7 +38,6 @@ gto_controller.lua
 ![OC Setup](docs/imgs/OCSetup.png)
 - In case of crashes just restart the station and run `gto_controller.lua`
  
----
 ## Configuration
 All default configuration is in `.env` file
 - Tailscale key can be obtained from the  [Tailscale Admin Console]([https://login.tailscale.com/admin/machines](https://login.tailscale.com/admin/machines))

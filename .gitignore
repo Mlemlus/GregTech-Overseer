@@ -6,9 +6,7 @@ gtnh-docker/.env
 
 # but the minecraft,
 gtnh-docker/gtnh-server/minecraft/*
-!gtnh-docker/gtnh-server/minecraft/config*
-!gtnh-docker/gtnh-server/minecraft/start.sh
-
+!gtnh-docker/gtnh-server/minecraft/config/OpenComputers.cfg
+ 
 # and the zips too
 *.zip
-
