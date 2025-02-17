@@ -1,7 +1,7 @@
 name: gtnh
 services:
   tailscale: # VPN service for connections
-    image: tailscale/tailscale:latest
+    image: tailscale/tailscale:stable
     container_name: gtnh_tailscale
     # Hostname for the "machine" which is the container running. appears as the name of the machine in Tailscale
     hostname: gtnh
